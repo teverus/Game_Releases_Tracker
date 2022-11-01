@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+from pathlib import Path
 
 from pandas import DataFrame
 from selenium import webdriver
@@ -7,31 +9,37 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from webdriver_manager.chrome import ChromeDriverManager
 
-from Code.functions.db import read_table, write_to_table
+from Code.TeverusSDK.DataBase import DataBase
+from Code.TeverusSDK.Screen import wait_for_key, Key
 
-COLUMNS = ["Title", "Day", "Month", "Year", "Genre"]
-TABLE = "GameReleases"
+COLUMNS = ["Title", "Day", "Month", "Year", "UnixReleaseDate", "Genre"]
 
 
 class UpdateGames:
     def __init__(self):
 
-        print("Checking games on IGN", end="\t")
+        self.db = DataBase(Path("Files/GameReleases.db"))
+
+        print(" Connecting to IGN database...", end="\t")
         self.ign_games = self.get_ign_games()
         print("Done")
 
-        print("Checking games in DB", end="\t")
-        self.known_games = self.get_known_games()
+        print(" Connecting to own database...", end="\t")
+        self.known_games, self.known_index = self.get_known_games(this_month=True)
         print("Done")
 
         different_length = len(self.ign_games) != len(self.known_games)
         if different_length or len(self.ign_games.compare(self.known_games)):
-            print("Updating known games", end="\t")
-            write_to_table(self.ign_games, TABLE)
+            print(" Updating known games", end="\t\t")
+            self.db.remove_by_index(self.known_index)
+            self.db.append_to_table(self.ign_games)
             print("Done")
 
         else:
-            print("No new games/info on IGN")
+            print(" >>> No new games/info on IGN <<<")
+
+        print('\n Press "Enter" to continue...')
+        wait_for_key(Key.ENTER)
 
     @staticmethod
     def get_driver(headless=False):
@@ -48,7 +56,7 @@ class UpdateGames:
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
         driver = webdriver.Chrome(
-            service=ChromeService(ChromeDriverManager().install()),
+            service=ChromeService(ChromeDriverManager(cache_valid_range=30).install()),
             options=options,
             desired_capabilities=capabilities,
         )
@@ -64,7 +72,8 @@ class UpdateGames:
         for index, game_card in enumerate(game_cards):
             title, genre, release_date = game_card.text.split("\n")
             day, month, year = self.get_release_date(release_date)
-            games.loc[index] = [title, day, month, year, genre]
+            unix_release_date = self.get_unix_release_date(day, month, year)
+            games.loc[index] = [title, day, month, year, unix_release_date, genre]
 
         return games
 
@@ -86,11 +95,25 @@ class UpdateGames:
 
             return game_cards
 
-    @staticmethod
-    def get_known_games():
-        df = read_table(TABLE)
+    def get_known_games(self, this_month=False):
+        df = self.db.read_table()
 
-        return df
+        if this_month:
+            month = f"{datetime.now():%b}".upper()
+            year = f"{datetime.now():%Y}".upper()
+            df = df.loc[(df.Month == month) & (df.Year == year)]
+
+        proper_index = list(df.index)
+        df = df.reset_index(drop=True)
+        return df, proper_index
+
+    @staticmethod
+    def get_unix_release_date(day, month, year):
+        if day:
+            expected_date = f"{day.rjust(2, '0')} {month} {year}"
+            date = datetime.strptime(expected_date, "%d %b %Y").timestamp()
+
+            return str(int(date))
 
 
 if __name__ == "__main__":

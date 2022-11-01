@@ -21,7 +21,7 @@ class Table:
         rows,
         rows_top_border="=",
         rows_bottom_border="=",
-        rows_centered=False,
+        rows_centered=True,
         # Table title
         table_title="",
         table_title_centered=True,
@@ -42,17 +42,18 @@ class Table:
         footer_actions=None,
     ):
         """
-        Base class for table
-
         [rows]
-            Can simple data structure or a list
-
-            e.g. ["a", "b", "c", "d"] or [["a", "b"], ["c", "d"]]
-
+            * A list of a list of lists
+            * Example: ["a", "b", "c", "d"] or [["a", "b"], ["c", "d"]]
         [column_widths]
-            A dict where key is column index and value is ColumnWidth.FIT or FULL
-
-            e.g. {0: ColumnWidth.FIT, 1: ColumnWidth.FULL}
+            * A dict where key is column index and value is ColumnWidth.FIT or FULL
+            * Example: {0: ColumnWidth.FIT, 1: ColumnWidth.FULL}
+        [highlight]
+            * A list of coordinates [x, y], where x - rows, y - columns
+            * Coordinates start from top left - [0, 0]
+            * Set False to remove highlight
+            * If None, it will be set to [0, 0] is a Table object is sent to Screen
+            * Example: [1, 2] - highlights second row third column
         """
         # === General settings
         self.highlight = highlight
@@ -174,7 +175,7 @@ class Table:
         column_widths = {}
 
         if not target_widths:
-            target_widths = {i: ColumnWidth.FIT for i in range(self.max_columns)}
+            target_widths = {i: ColumnWidth.FULL for i in range(self.max_columns)}
 
         ful_cols = {k: v for k, v in target_widths.items() if v == ColumnWidth.FULL}
         fit_cols = {k: v for k, v in target_widths.items() if v == ColumnWidth.FIT}
@@ -183,7 +184,12 @@ class Table:
         for col_index, width_type in expected_widths.items():
             if self.table_width:
                 if width_type == ColumnWidth.FIT:
-                    target_length = max([len(r[col_index]) for r in self.rows])
+                    target_length = max(
+                        [
+                            len(row[col_index]) if isinstance(row, list) else len(row)
+                            for row in self.rows
+                        ]
+                    )
 
                 else:
                     already_used = sum([v for v in column_widths.values()])
@@ -316,12 +322,11 @@ class Table:
         return proper_row != 1
 
     def get_table_width(self, expected_width):
-        table_width = None
         known_lengths = []
         side_padding = 2
 
         if expected_width:
-            table_width = expected_width
+            return expected_width
 
         if self.table_title:
             table_width = len(self.table_title)

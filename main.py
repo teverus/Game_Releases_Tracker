@@ -1,15 +1,25 @@
-from Code.Table import Table
+from Code.Screens.CheckNewGamesOnIGN import CheckNewGamesOnIGN
+from Code.TeverusSDK.Screen import Screen, Action
+from Code.TeverusSDK.Table import Table
 
 
-class Application:
+class WelcomeScreen(Screen):
     def __init__(self):
-        self.table = Table(
-            table_title="This is a pig",
-            rows=[["Hello", "1"], ["world", "This is not just any pig!"]],
+        actions = [
+            Action(name="Check new games on IGN", function=CheckNewGamesOnIGN),
+            Action(name="This month's releases"),
+            Action(name="Future releases"),
+            Action(name="Releases by game genre"),
+        ]
+
+        table = Table(
+            table_title="Game releases tracker",
+            rows=[action.name for action in actions],
+            table_width=100,
         )
-        self.table.print_table()
-        a = 1
+
+        super(WelcomeScreen, self).__init__(table, actions)
 
 
 if __name__ == "__main__":
-    Application()
+    WelcomeScreen()
