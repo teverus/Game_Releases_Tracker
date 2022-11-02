@@ -2,60 +2,18 @@ import msvcrt
 import os
 
 import bext
+from colorama import Back, Fore
 
 from Code.TeverusSDK.Table import Table
 
+HIGHLIGHT = Back.WHITE + Fore.BLACK
+END_HIGHLIGHT = Back.BLACK + Fore.WHITE
 
-def do_nothing():
-    pass
-
-
-def wait_for_key(target_key):
-    key = msvcrt.getch()
-    while key != target_key:
-        key = msvcrt.getch()
-
-
-class Action:
-    def __init__(
-        self,
-        name=None,
-        function=None,
-        arguments=None,
-        immediate_action=False,
-        go_back=False,
-    ):
-        self.name = name
-        self.function = function
-        self.arguments = arguments
-        self.immediate_action = immediate_action
-        self.go_back = go_back
-
-    def __call__(self, *args, **kwargs):
-        if self.arguments:
-            self.function(**self.arguments)
-        else:
-            self.function()
-
-
-class Key:
-    DOWN = b"P"
-    UP = b"H"
-    RIGHT = b"M"
-    LEFT = b"K"
-
-    ENTER = b"\r"
-
-    Q = b"q"
-    Q_RU = b"\xa9"
-    Z = b"z"
-    Z_RU = b"\xef"
-    X = b"x"
-    X_RU = b"\xe7"
+SCREEN_WIDTH = 100
 
 
 class Screen:
-    def __init__(self, table: Table, actions: list[Action]):
+    def __init__(self, table: Table, actions: list):
         """
         [table]
             * Must be an instance of Table
@@ -94,7 +52,8 @@ class Screen:
             # [3] If an action is required, perform the action
             if action:
 
-                if isinstance(action, Action) and not action.name and action.go_back:
+                # [3-0] Go back if a shortcut is pressed
+                if isinstance(action, Action) and action.is_shortcut and action.go_back:
                     break
 
                 # [3-1-1] Choose an action from the table if there is one
@@ -180,7 +139,7 @@ class Screen:
         # If the user pressed one of the shortcut keys
         elif user_input in shortcut:
             if user_input in [Key.Q, Key.Q_RU]:
-                action = Action(go_back=True)
+                action = Action(go_back=True, is_shortcut=True)
             elif user_input in [Key.Z, Key.Z_RU]:
                 if self.table.current_page != 1:
                     self.table.current_page -= 1
@@ -307,3 +266,72 @@ class Screen:
         target_index = x - table_length
 
         return self.table.footer_actions[target_index]
+
+
+########################################################################################
+#    CLASSES RELATED TO SCREEN                                                         #
+########################################################################################
+
+
+class Action:
+    def __init__(
+        self,
+        name=None,
+        function=None,
+        arguments=None,
+        immediate_action=False,
+        go_back=False,
+        is_shortcut=False,
+    ):
+        self.name = name
+        self.function = function
+        self.arguments = arguments
+        self.immediate_action = immediate_action
+        self.go_back = go_back
+        self.is_shortcut = is_shortcut
+
+    def __call__(self, *args, **kwargs):
+        if self.arguments:
+            self.function(**self.arguments)
+        else:
+            self.function()
+
+
+class Key:
+    DOWN = b"P"
+    UP = b"H"
+    RIGHT = b"M"
+    LEFT = b"K"
+
+    ENTER = b"\r"
+
+    Q = b"q"
+    Q_RU = b"\xa9"
+    Z = b"z"
+    Z_RU = b"\xef"
+    X = b"x"
+    X_RU = b"\xe7"
+
+
+########################################################################################
+#    HELPER FUNCTIONS                                                                  #
+########################################################################################
+
+
+def do_nothing():
+    pass
+
+
+def wait_for_key(target_key):
+    key = msvcrt.getch()
+    while key != target_key:
+        key = msvcrt.getch()
+
+
+def show_message(message, border=" ", centered=True, upper=True):
+    print(HIGHLIGHT)
+    print(f"{border * SCREEN_WIDTH}")
+    message = message.upper() if upper else message
+    text = message.center if centered else message.ljust
+    print(text(SCREEN_WIDTH))
+    print(f"{border * SCREEN_WIDTH}{END_HIGHLIGHT}")

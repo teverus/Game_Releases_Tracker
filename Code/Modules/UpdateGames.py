@@ -10,7 +10,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from webdriver_manager.chrome import ChromeDriverManager
 
 from Code.TeverusSDK.DataBase import DataBase
-from Code.TeverusSDK.Screen import wait_for_key, Key
+from Code.TeverusSDK.Screen import wait_for_key, Key, show_message
 
 COLUMNS = ["Title", "Day", "Month", "Year", "UnixReleaseDate", "Genre"]
 
@@ -36,7 +36,7 @@ class UpdateGames:
             print("Done")
 
         else:
-            print(" >>> No new games/info on IGN <<<")
+            show_message("No new games/info on IGN")
 
         print('\n Press "Enter" to continue...')
         wait_for_key(Key.ENTER)

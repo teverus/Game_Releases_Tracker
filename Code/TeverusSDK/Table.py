@@ -54,6 +54,12 @@ class Table:
             * Set False to remove highlight
             * If None, it will be set to [0, 0] is a Table object is sent to Screen
             * Example: [1, 2] - highlights second row third column
+        [footer_actions]
+            * A list of Action, imported from Screen
+            * Example: [Action(name="[Q] Exit", function=do_nothing, go_back=True)]
+        [footer_bottom_border]
+            * Used to print the lowest border of the table
+            * Set to empty string ("") if you want it to disappear
         """
         # === General settings
         self.highlight = highlight
