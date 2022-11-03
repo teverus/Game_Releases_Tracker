@@ -155,7 +155,8 @@ class Table:
                     line = highlighted if is_highlighted else line
                 print(f" {line} ")
 
-            print(self.footer_bottom_border * self.border_length)
+            if self.footer_bottom_border:
+                print(self.footer_bottom_border * self.border_length)
 
         # Adjust the cage after the table has been recreated
         self.cage = self.get_cage()
@@ -183,10 +184,11 @@ class Table:
         if not target_widths:
             target_widths = {i: ColumnWidth.FULL for i in range(self.max_columns)}
 
-        ful_cols = {k: v for k, v in target_widths.items() if v == ColumnWidth.FULL}
         fit_cols = {k: v for k, v in target_widths.items() if v == ColumnWidth.FIT}
-        expected_widths = {**fit_cols, **ful_cols}
+        full_cols = {k: v for k, v in target_widths.items() if v == ColumnWidth.FULL}
+        expected_widths = {**fit_cols, **full_cols}
 
+        full_target_length = None
         for col_index, width_type in expected_widths.items():
             if self.table_width:
                 if width_type == ColumnWidth.FIT:
@@ -198,14 +200,17 @@ class Table:
                     )
 
                 else:
-                    already_used = sum([v for v in column_widths.values()])
-                    remaining = actual_width - already_used
-                    number_of_full_cols = len(ful_cols)
-                    if remaining % number_of_full_cols == 0:
-                        target_length = int(remaining / number_of_full_cols)
-                    else:
-                        target_length = None
-                        raise NotImplementedError("Something went wrong...")
+                    if not full_target_length:
+                        already_used = sum([v for v in column_widths.values()])
+                        remaining = actual_width - already_used
+                        number_of_full_cols = len(full_cols)
+                        if remaining % number_of_full_cols == 0:
+                            full_target_length = int(remaining / number_of_full_cols)
+                        else:
+                            extra = remaining % number_of_full_cols
+                            proper_width = self.table_width - extra
+                            raise Exception(f"Please use table_width = {proper_width}")
+                    target_length = full_target_length
 
                 column_widths[col_index] = target_length
             else:

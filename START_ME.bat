@@ -1,5 +1,5 @@
 @echo off
-mode con: cols=100 lines=38
+mode con: cols=99 lines=37
 title=Game Releases Tracker
 
 : ======================================================================================

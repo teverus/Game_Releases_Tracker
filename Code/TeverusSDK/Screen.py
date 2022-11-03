@@ -9,7 +9,8 @@ from Code.TeverusSDK.Table import Table
 HIGHLIGHT = Back.WHITE + Fore.BLACK
 END_HIGHLIGHT = Back.BLACK + Fore.WHITE
 
-SCREEN_WIDTH = 100
+SCREEN_WIDTH = 99
+GO_BACK = "[Q] Go back    "
 
 
 class Screen:
