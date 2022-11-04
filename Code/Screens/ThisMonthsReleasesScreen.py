@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from Code.Modules.OpenGameInSteam import OpenGameInSteam
 from Code.TeverusSDK.DataBase import DataBase
 from Code.TeverusSDK.Screen import Screen, SCREEN_WIDTH, Action, do_nothing, GO_BACK
 from Code.TeverusSDK.Table import Table, ColumnWidth
@@ -35,14 +36,14 @@ class ThisMonthsReleasesScreen(Screen):
             rows.append(line)
 
         actions = [
-            Action(name="Hello", function=do_nothing),
-            Action(name="World", function=do_nothing),
+            Action(name=row, function=OpenGameInSteam, arguments={"game_title": row})
+            for row in rows
         ]
 
         table = Table(
             table_title="This month's releases",
             table_width=SCREEN_WIDTH,
-            rows=rows,
+            rows=[action.name for action in actions],
             max_rows=30,
             column_widths={0: ColumnWidth.FIT, 1: ColumnWidth.FULL},
             footer_actions=[Action(name=GO_BACK, function=do_nothing, go_back=True)],

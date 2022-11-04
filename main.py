@@ -4,9 +4,6 @@ from Code.TeverusSDK.Screen import Screen, Action, do_nothing, SCREEN_WIDTH
 from Code.TeverusSDK.Table import Table
 
 
-# TODO Если на главной нажать X, то больше нельзя переключиться :(
-
-
 class WelcomeScreen(Screen):
     def __init__(self):
         actions = [
@@ -19,9 +16,9 @@ class WelcomeScreen(Screen):
         table = Table(
             table_title="Game releases tracker",
             rows=[action.name for action in actions],
+            rows_bottom_border=False,
             table_width=SCREEN_WIDTH,
-            footer_actions=[Action(name="[Q] Exit", function=do_nothing, go_back=True)],
-            footer_bottom_border="",
+            footer_bottom_border=False,
         )
 
         super(WelcomeScreen, self).__init__(table, actions)

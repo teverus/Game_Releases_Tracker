@@ -145,7 +145,8 @@ class Screen:
                 if self.table.current_page != 1:
                     self.table.current_page -= 1
             elif user_input in [Key.X, Key.X_RU]:
-                if self.table.current_page != self.table.max_page:
+                max_page = self.table.max_page
+                if max_page and self.table.current_page != max_page:
                     self.table.current_page += 1
             else:
                 raise NotImplemented(f"{user_input = }")
@@ -284,6 +285,13 @@ class Action:
         go_back=False,
         is_shortcut=False,
     ):
+        """
+        [arguments]
+            * A dict where key is the name of the argument in the function,
+            value - the actual value
+            * Key and the name of the argument must be identical
+            * Example: {"game_title": row}
+        """
         self.name = name
         self.function = function
         self.arguments = arguments
