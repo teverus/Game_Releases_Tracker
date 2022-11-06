@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from requests import get
 
 
-class OpenGameInSteam:
+class OpenInSteam:
     def __init__(self, game_title):
         game_title = game_title.strip().split(" | ")[-1]
 

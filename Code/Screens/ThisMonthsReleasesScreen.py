@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from Code.Modules.OpenGameInSteam import OpenGameInSteam
+from Code.Modules.HideGame import HideGame
+from Code.Modules.OpenInSteam import OpenInSteam
 from Code.TeverusSDK.DataBase import DataBase
 from Code.TeverusSDK.Screen import Screen, SCREEN_WIDTH, Action, do_nothing, GO_BACK
 from Code.TeverusSDK.Table import Table, ColumnWidth
@@ -16,13 +17,14 @@ class ThisMonthsReleasesScreen(Screen):
         year = datetime.today().strftime("%Y")
         today = f"{day} {month.capitalize()} {year}"
 
-        df = DataBase(Path("Files/GameReleases.db")).read_table()
-        df = df.loc[df.Month == month]
-        df.reset_index(drop=True, inplace=True)
+        self.db = DataBase(Path("Files/GameReleases.db"))
+        self.df = self.db.read_table()
+        self.df = self.df.loc[self.df.Month == month]
+        self.df.reset_index(drop=True, inplace=True)
 
         games = {}
-        for index in range(len(df)):
-            game = df.loc[index]
+        for index in range(len(self.df)):
+            game = self.df.loc[index]
             title = game.Title
             day_ = "?? " if not game.Day else f"{game.Day.rjust(2, '0')} "
             date = f"{day_}{game.Month.capitalize()} {game.Year}"
@@ -32,22 +34,36 @@ class ThisMonthsReleasesScreen(Screen):
         rows = []
         for title, date in games.items():
             mark = ">>> " if date == today else "    "
-            line = f"{mark}{date} | {title.ljust(max_len)}".center(SCREEN_WIDTH - 2)
+            line = f"{mark}{date} | {title.ljust(max_len)}"
             rows.append(line)
 
-        actions = [
-            Action(name=row, function=OpenGameInSteam, arguments={"game_title": row})
+        self.actions = [
+            [
+                Action(
+                    name=row,
+                    function=OpenInSteam,
+                    arguments={"game_title": row},
+                ),
+                Action(
+                    name="Hide",
+                    function=HideGame,
+                    arguments={"game_title": row, "main": self},
+                ),
+            ]
             for row in rows
         ]
 
-        table = Table(
+        self.table = Table(
             table_title="This month's releases",
             table_width=SCREEN_WIDTH,
-            rows=[action.name for action in actions],
-            max_rows=30,
+            rows=[[a[0].name, a[1].name] for a in self.actions],
+            max_rows=29,
             column_widths={0: ColumnWidth.FIT, 1: ColumnWidth.FULL},
-            footer_actions=[Action(name=GO_BACK, function=do_nothing, go_back=True)],
+            footer_actions=[
+                Action(name=GO_BACK, function=do_nothing, go_back=True),
+                Action(name="[S] Show hidden releases", function=do_nothing),
+            ],
             footer_bottom_border="",
         )
 
-        super(ThisMonthsReleasesScreen, self).__init__(table, actions)
+        super(ThisMonthsReleasesScreen, self).__init__(self.table, self.actions)

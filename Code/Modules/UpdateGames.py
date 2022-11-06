@@ -12,7 +12,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from Code.TeverusSDK.DataBase import DataBase
 from Code.TeverusSDK.Screen import wait_for_key, Key, show_message
 
-COLUMNS = ["Title", "Day", "Month", "Year", "UnixReleaseDate", "Genre"]
+COLUMNS = ["Title", "Day", "Month", "Year", "UnixReleaseDate", "Genre", "Hidden"]
 
 
 class UpdateGames:
@@ -68,11 +68,12 @@ class UpdateGames:
 
         games = DataFrame([], columns=COLUMNS)
 
-        for index, game_card in enumerate(game_cards):
+        for i, game_card in enumerate(game_cards):
             title, genre, release_date = game_card.text.split("\n")
             day, month, year = self.get_release_date(release_date)
             unix_release_date = self.get_unix_release_date(day, month, year)
-            games.loc[index] = [title, day, month, year, unix_release_date, genre]
+            hidden = "0"
+            games.loc[i] = [title, day, month, year, unix_release_date, genre, hidden]
 
         return games
 

@@ -166,7 +166,8 @@ class Table:
     # ==================================================================================
 
     def get_df(self):
-        proper_rows = [r if isinstance(r, list) else [r] for r in self.get_rows()]
+        rows = self.get_rows()
+        proper_rows = [r if isinstance(r, list) else [r] for r in rows]
         max_columns = len(proper_rows[0])
         max_rows = len(proper_rows)
 

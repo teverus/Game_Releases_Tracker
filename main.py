@@ -9,7 +9,7 @@ class WelcomeScreen(Screen):
         actions = [
             Action(name="Check new games on IGN", function=CheckNewGamesOnIGNScreen),
             Action(name="This month's releases", function=ThisMonthsReleasesScreen),
-            Action(name="Future releases"),
+            Action(name="See all releases"),
             Action(name="Releases by game genre"),
         ]
 
