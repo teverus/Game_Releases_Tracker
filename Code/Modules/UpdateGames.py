@@ -30,15 +30,13 @@ class UpdateGames:
 
         different_length = len(self.ign_games) != len(self.known_games)
         if different_length or len(self.ign_games.compare(self.known_games)):
+            # TODO !! Обновление информации сбрасывает Hidden
             self.db.remove_by_index(self.known_index)
             self.db.append_to_table(self.ign_games)
             show_message("Information was updated")
 
         else:
             show_message("No new games/info on IGN")
-
-        print('\n Press "Enter" to continue...')
-        wait_for_key(Key.ENTER)
 
     @staticmethod
     def get_driver(headless=False):

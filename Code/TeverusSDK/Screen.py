@@ -337,10 +337,14 @@ def wait_for_key(target_key):
         key = msvcrt.getch()
 
 
-def show_message(message, border=" ", centered=True, upper=True):
+def show_message(message, border=" ", centered=True, upper=True, wait_for_enter=True):
     print(HIGHLIGHT)
     print(f"{border * SCREEN_WIDTH}")
     message = message.upper() if upper else message
     text = message.center if centered else message.ljust
     print(text(SCREEN_WIDTH))
     print(f"{border * SCREEN_WIDTH}{END_HIGHLIGHT}")
+
+    if wait_for_enter:
+        print('\n Press "Enter" to continue...')
+        wait_for_key(Key.ENTER)

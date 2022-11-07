@@ -19,7 +19,7 @@ class ThisMonthsReleasesScreen(Screen):
 
         self.db = DataBase(Path("Files/GameReleases.db"))
         self.df = self.db.read_table()
-        self.df = self.df.loc[self.df.Month == month]
+        self.df = self.df.loc[(self.df.Month == month) & (self.df.Hidden != "1")]
         self.df.reset_index(drop=True, inplace=True)
 
         games = {}
@@ -61,6 +61,7 @@ class ThisMonthsReleasesScreen(Screen):
             column_widths={0: ColumnWidth.FIT, 1: ColumnWidth.FULL},
             footer_actions=[
                 Action(name=GO_BACK, function=do_nothing, go_back=True),
+                # TODO Реализовать вот это
                 Action(name="[S] Show hidden releases", function=do_nothing),
             ],
             footer_bottom_border="",

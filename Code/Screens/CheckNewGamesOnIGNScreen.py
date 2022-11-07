@@ -16,7 +16,7 @@ class CheckNewGamesOnIGNScreen(Screen):
 
         table = Table(
             table_title="Check new games on IGN",
-            rows=[action.name for action in actions],  # TODO Сделать по умолчанию?
+            rows=[action.name for action in actions],
             highlight=False,
             rows_bottom_border="",
             table_width=SCREEN_WIDTH,

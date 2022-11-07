@@ -285,7 +285,10 @@ class Table:
         if self.max_rows_raw and not self.several_columns_expected:
             size = self.max_rows * self.max_columns
             previous_page = self.current_page - 1
-            pack = self.rows_raw[size * previous_page : size * self.current_page]
+            start = size * previous_page
+            end = size * self.current_page
+
+            pack = self.rows_raw[start:end]
 
             rows = []
 
@@ -307,8 +310,14 @@ class Table:
         elif self.max_rows_raw:
             size = self.max_rows
             previous_page = self.current_page - 1
+            start = size * previous_page
+            end = size * self.current_page
 
-            return self.rows_raw[size * previous_page : size * self.current_page]
+            pack = self.rows_raw[start:end]
+            # TODO !! Добавлять [""]/"" если не хватает
+            ...
+
+            return pack
 
         else:
             return self.rows_raw
