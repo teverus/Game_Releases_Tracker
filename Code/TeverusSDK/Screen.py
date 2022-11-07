@@ -14,16 +14,24 @@ GO_BACK = "[Q] Go back    "
 
 
 class Screen:
-    def __init__(self, table: Table, actions: list):
+    def __init__(self, table: Table, actions: list, shortcuts: dict = None):
         """
         [table]
             * Must be an instance of Table
+            * Example: Table(table_title="Hello world", rows=["Hello", "world"])
         [actions]
             * A list of one or more instances of Action, imported from this file
+            * Example: [Action(name="Hello", function=do_nothing)]
+        [shortcuts]
+            * A dict where key is an instance of Key imported from Screen, value - an instance of Action
+            * Action in the value MUST have is_shortcut set to True
+            * Action in the value may have a name, it's not show anywhere
+            * Example: Action(function=ShowHiddenReleases, is_shortcut=True)
         """
 
         self.table = table
         self.actions = actions
+        self.specific_shortcuts = self.get_shortcuts(shortcuts)
 
         if self.table.highlight is None:
             self.table.highlight = [0, 0]
@@ -53,8 +61,10 @@ class Screen:
             # [3] If an action is required, perform the action
             if action:
 
-                # [3-0] Go back if a shortcut is pressed
-                if isinstance(action, Action) and action.is_shortcut and action.go_back:
+                # [3-0] If a shortcut was pressed, execute its action
+                if isinstance(action, Action) and action.is_shortcut:
+                    if not action.go_back:
+                        action()
                     break
 
                 # [3-1-1] Choose an action from the table if there is one
@@ -79,16 +89,17 @@ class Screen:
             self.table.print()
 
     def get_user_action(self):
-        # Declare major variables that will be returned
+        # [1] Declare major variables that will be returned
         highlight = self.table.highlight
         highlight_footer = self.table.highlight_footer
         action = False
 
-        # A set of coordinates
+        # [2-1] Declare default values: a set of coordinates
         mv = {Key.DOWN: (1, 0), Key.UP: (-1, 0), Key.RIGHT: (0, 1), Key.LEFT: (0, -1)}
 
-        # Shortcut keys
-        shortcut = [
+        # [2-2] Declare default shortcut keys
+        # TODO ! Вот тут надо что-то придумать
+        default_shortcuts = [
             # Go back
             Key.Q,
             Key.Q_RU,
@@ -100,14 +111,14 @@ class Screen:
             Key.X_RU,
         ]
 
-        # Get user input
+        # [3] Get user input
         user_input = msvcrt.getch()
 
-        # If the user pressed "Enter"
+        # [3-1] If the user pressed "Enter"
         if user_input == Key.ENTER:
             action = True
 
-        # If the user pressed one of the arrow keys
+        # [3-2] If the user pressed one of the arrow keys
         elif user_input in mv.keys():
 
             # Get the new position based on the user input
@@ -137,8 +148,8 @@ class Screen:
                 highlight = new_pos
                 highlight_footer = None if highlight_footer else highlight_footer
 
-        # If the user pressed one of the shortcut keys
-        elif user_input in shortcut:
+        # [3-3] If the user pressed one of the default shortcut keys
+        elif user_input in default_shortcuts:
             if user_input in [Key.Q, Key.Q_RU]:
                 action = Action(go_back=True, is_shortcut=True)
             elif user_input in [Key.Z, Key.Z_RU]:
@@ -150,6 +161,10 @@ class Screen:
                     self.table.current_page += 1
             else:
                 raise NotImplemented(f"{user_input = }")
+
+        # [3-4] If the user pressed one of the screen specific shortcuts
+        elif user_input in self.specific_shortcuts:
+            action = self.specific_shortcuts[user_input]
 
         return highlight, highlight_footer, action
 
@@ -269,6 +284,17 @@ class Screen:
 
         return self.table.footer_actions[target_index]
 
+    @staticmethod
+    def get_shortcuts(shortcuts):
+        result = {}
+
+        if shortcuts:
+            for key, action in shortcuts.items():
+                action.is_shortcut = True
+                result[key] = action
+
+        return result
+
 
 ########################################################################################
 #    CLASSES RELATED TO SCREEN                                                         #
@@ -320,6 +346,9 @@ class Key:
     Z_RU = b"\xef"
     X = b"x"
     X_RU = b"\xe7"
+
+    S = b"s"
+    S_RU = b"\xeb"
 
 
 ########################################################################################
