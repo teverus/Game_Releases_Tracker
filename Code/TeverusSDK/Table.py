@@ -314,8 +314,9 @@ class Table:
             end = size * self.current_page
 
             pack = self.rows_raw[start:end]
-            # TODO !! Добавлять [""]/"" если не хватает
-            ...
+            while len(pack) < self.max_rows_raw:
+                dummy = ["" for _ in range(len(pack[0]))]
+                pack.append(dummy)
 
             return pack
 

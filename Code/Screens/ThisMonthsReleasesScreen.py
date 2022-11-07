@@ -62,7 +62,7 @@ class ThisMonthsReleasesScreen(Screen):
             footer_actions=[
                 Action(name=GO_BACK, function=do_nothing, go_back=True),
                 # TODO Реализовать вот это
-                Action(name="[S] Show hidden releases", function=do_nothing),
+                Action(name="[S] Show hidden", function=do_nothing),
             ],
             footer_bottom_border="",
         )
