@@ -272,14 +272,10 @@ class Table:
         return None
 
     def get_max_page(self):
-        if self.max_rows_raw is None:
-            return None
+        columns = 1 if self.several_columns_expected else self.max_columns
+        max_page = ceil(len(self.rows_raw) / (self.max_rows * columns))
 
-        elif self.max_rows_raw is not None and self.several_columns_expected:
-            return ceil(len(self.rows_raw) / self.max_rows)
-
-        else:
-            return ceil(len(self.rows_raw) / (self.max_rows * self.max_columns))
+        return max_page
 
     def get_rows(self):
         if self.max_rows_raw and not self.several_columns_expected:
@@ -334,7 +330,9 @@ class Table:
 
     @staticmethod
     def get_max_columns(rows):
-        return max([len(row) if isinstance(row, list) else len([row]) for row in rows])
+        max_columns = max([len(r) if isinstance(r, list) else len([r]) for r in rows])
+
+        return max_columns
 
     @staticmethod
     def get_several_columns_expected(rows):
@@ -366,3 +364,6 @@ class Table:
         table_width = max(known_lengths)
 
         return table_width
+
+    def get_max_rows(self, max_rows):
+        ...

@@ -101,8 +101,8 @@ class Screen:
         # TODO ! Вот тут надо что-то придумать
         default_shortcuts = [
             # Go back
-            Key.Q,
-            Key.Q_RU,
+            # Key.Q,
+            # Key.Q_RU,
             # Previous page
             Key.Z,
             Key.Z_RU,

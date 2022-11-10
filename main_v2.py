@@ -1,11 +1,11 @@
 from Code.Screens.CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
 from Code.Screens.ThisMonthsReleasesScreen import ThisMonthsReleasesScreen
-from Code.TeverusSDK.Screen import Screen, Action, SCREEN_WIDTH
-from Code.TeverusSDK.Table import Table
+from Code.TeverusSDK.Screen import Action, SCREEN_WIDTH
+from Code.TeverusSDK.ScreenV2 import ScreenV2
 from Code.TeverusSDK.TableV2 import TableV2
 
 
-class WelcomeScreen(Screen):
+class WelcomeScreenV2(ScreenV2):
     def __init__(self):
         self.actions = [
             Action(name="Check new games on IGN", function=CheckNewGamesOnIGNScreen),
@@ -14,24 +14,17 @@ class WelcomeScreen(Screen):
             Action(name="Releases by game genre"),
         ]
 
-        self.table = Table(
+        self.table = TableV2(
             table_title="Game releases tracker",
-            rows=[action.name for action in self.actions],
+            rows=[a.name for a in self.actions],
             rows_bottom_border=False,
-            table_width=SCREEN_WIDTH,
-            footer_bottom_border=False,
-        )
-
-        self.table2 = TableV2(
-            table_title="Game releases tracker",
-            rows=[action.name for action in self.actions],
-            rows_bottom_border=False,
-            footer_bottom_border=False,
             table_width=SCREEN_WIDTH,
         )
 
-        super(WelcomeScreen, self).__init__(self.table, self.actions)
+        self.table.print_table()
+
+        super(WelcomeScreenV2, self).__init__(self.table, self.actions)
 
 
 if __name__ == "__main__":
-    WelcomeScreen()
+    WelcomeScreenV2()
