@@ -21,8 +21,6 @@ class WelcomeScreenV2(ScreenV2):
             table_width=SCREEN_WIDTH,
         )
 
-        self.table.print_table()
-
         super(WelcomeScreenV2, self).__init__(self.table, self.actions)
 
 

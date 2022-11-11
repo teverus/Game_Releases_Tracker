@@ -66,11 +66,11 @@ class TableV2:
         # General table
         self.highlight = highlight
         self.current_page = current_page
-
-        # Calculated values
         self.max_rows = self.get_max_rows(max_rows)
         self.max_columns = self.get_max_columns(max_columns)
+        self.cage = self.get_cage()
 
+        # Calculated values
         self.walls_length = (self.max_columns - 1) * self.wall_length
         self.visible_rows = self.get_visible_rows()
         self.table_width = self.get_table_width(table_width)
@@ -81,9 +81,11 @@ class TableV2:
     ####################################################################################
     def print_table(self):
 
+        # Clear the console
         os.system("cls")
         bext.hide()
 
+        # Print table title if any
         if self.table_title:
             print(self.table_title_top_border * self.table_width)
 
@@ -92,22 +94,28 @@ class TableV2:
             tt = tt.center(self.table_width) if self.table_title_centered else tt
             print(tt)
 
+        # Print rows top border if any
         if self.rows_top_border:
             print(self.rows_top_border * self.table_width)
 
+        # Print rows, highlighting them if necessary
         self.visible_rows = self.get_visible_rows()
-        for index_row, row in enumerate(self.visible_rows):
+        for index_y, row in enumerate(self.visible_rows):
             line = []
-            for index_col, col in enumerate(row):
-                target_width = self.column_widths[index_col]
-                col = col.center(target_width) if self.rows_centered else col
-                line.append(col)
+            for index_x, cell in enumerate(row):
+                target_width = self.column_widths[index_x]
+                cell = cell.center(target_width) if self.rows_centered else cell
+                highlighted = f"{HIGHLIGHT}{cell}{END_HIGHLIGHT}"
+                data = highlighted if [index_x, index_y] == self.highlight else cell
+                line.append(data)
             line = " | ".join(line)
             print(f" {line} ")
 
+        # Print rows bottom border if any
         if self.rows_bottom_border:
             print(self.rows_bottom_border * self.table_width)
 
+        # Print footer if any
         if self.footer:
             ...
 
@@ -137,9 +145,11 @@ class TableV2:
 
         known_lengths = []
 
+        # Calculate the widest possible title length
         title_width = len(self.table_title) + self.side_padding_length
         known_lengths.append(title_width)
 
+        # Calculate the widest possible row length
         max_row = max([sum([len(e) for e in row]) for row in self.visible_rows])
         max_row_length = max_row + self.walls_length + self.side_padding_length
         known_lengths.append(max_row_length)
@@ -199,3 +209,14 @@ class TableV2:
             result = self.rows
 
         return result
+
+    def get_cage(self):
+        x_axis = [number for number in range(self.max_columns)]
+        y_axis = [number for number in range(self.max_rows)]
+
+        coordinates = []
+        for y in y_axis:
+            for x in x_axis:
+                coordinates.append([x, y])
+
+        return coordinates
