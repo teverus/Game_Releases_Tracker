@@ -1,7 +1,7 @@
-from Code.Screens.CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
+from Code.Screens.old.z_CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
 from Code.Screens.ThisMonthsReleasesScreen import ThisMonthsReleasesScreen
-from Code.TeverusSDK.Screen import Screen, Action, SCREEN_WIDTH
-from Code.TeverusSDK.Table import Table
+from Code.TeverusSDK.old.z_Screen import Screen, Action, SCREEN_WIDTH
+from Code.TeverusSDK.old.z_Table import Table
 from Code.TeverusSDK.TableV2 import TableV2
 
 

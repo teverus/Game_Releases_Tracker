@@ -1,23 +1,14 @@
+from datetime import datetime
 from pathlib import Path
 
 from Code.Modules.HideGame import HideGame
 from Code.Modules.OpenInSteam import OpenInSteam
-from Code.Modules.ShowHiddenReleases import ShowHiddenReleases
 from Code.TeverusSDK.DataBase import DataBase
-from Code.TeverusSDK.Screen import (
-    Screen,
-    SCREEN_WIDTH,
-    Action,
-    do_nothing,
-    GO_BACK,
-    Key,
-)
-from Code.TeverusSDK.Table import Table, ColumnWidth
-
-from datetime import datetime
+from Code.TeverusSDK.ScreenV2 import ScreenV2, Action, SCREEN_WIDTH
+from Code.TeverusSDK.TableV2 import TableV2, ColumnWidth
 
 
-class ThisMonthsReleasesScreen(Screen):
+class ThisMonthsReleasesScreen(ScreenV2):
     def __init__(self):
 
         self.db = None
@@ -40,30 +31,32 @@ class ThisMonthsReleasesScreen(Screen):
             for row in self.rows
         ]
 
-        self.table = Table(
+        self.table = TableV2(
             table_title="This month's releases",
             table_width=SCREEN_WIDTH,
             rows=[[a[0].name, a[1].name] for a in self.actions],
             max_rows=29,
             column_widths={0: ColumnWidth.FIT, 1: ColumnWidth.FULL},
-            footer_actions=[
-                Action(name=GO_BACK, function=do_nothing, go_back=True),
-                Action(
-                    name="[S] Show hidden",
-                    function=ShowHiddenReleases,
-                    arguments={"main": self},
-                ),
-            ],
+            # footer_actions=[
+            #     Action(name=GO_BACK, function=do_nothing, go_back=True),
+            #     Action(
+            #         name="[S] Show hidden",
+            #         function=ShowHiddenReleases,
+            #         arguments={"main": self},
+            #     ),
+            # ],
             footer_bottom_border="",
         )
 
-        self.shortcuts = {
-            Key.S: self.table.footer_actions[1],
-            Key.S_RU: self.table.footer_actions[1],
-        }
+        # self.shortcuts = {
+        #     Key.S: self.table.footer_actions[1],
+        #     Key.S_RU: self.table.footer_actions[1],
+        # }
 
         super(ThisMonthsReleasesScreen, self).__init__(
-            self.table, self.actions, self.shortcuts
+            self.table,
+            self.actions,
+            # self.shortcuts
         )
 
     def get_rows(self, remove_hidden=False):

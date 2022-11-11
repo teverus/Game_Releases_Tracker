@@ -1,11 +1,11 @@
 from Code.Modules.UpdateGames import UpdateGames
-from Code.TeverusSDK.Screen import Screen, Action, SCREEN_WIDTH
-from Code.TeverusSDK.Table import Table
+from Code.TeverusSDK.ScreenV2 import ScreenV2, Action, SCREEN_WIDTH
+from Code.TeverusSDK.TableV2 import TableV2
 
 
-class CheckNewGamesOnIGNScreen(Screen):
+class CheckNewGamesOnIGNScreen(ScreenV2):
     def __init__(self):
-        actions = [
+        self.actions = [
             Action(
                 name=" ",
                 function=UpdateGames,
@@ -14,12 +14,12 @@ class CheckNewGamesOnIGNScreen(Screen):
             )
         ]
 
-        table = Table(
+        self.table = TableV2(
             table_title="Check new games on IGN",
-            rows=[action.name for action in actions],
+            rows=[action.name for action in self.actions],
             highlight=False,
-            rows_bottom_border="",
+            rows_bottom_border=False,
             table_width=SCREEN_WIDTH,
         )
 
-        super(CheckNewGamesOnIGNScreen, self).__init__(table, actions)
+        super(CheckNewGamesOnIGNScreen, self).__init__(self.table, self.actions)

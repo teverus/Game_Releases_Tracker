@@ -3,9 +3,30 @@ import os
 
 import bext
 
+########################################################################################
+#    SCREEN CONFIGS                                                                    #
+########################################################################################
+from Code.TeverusSDK.TableV2 import HIGHLIGHT, END_HIGHLIGHT
 
+SCREEN_WIDTH = 99
+GO_BACK = "[Q] Go back    "
+
+
+########################################################################################
+#    SCREEN CLASS                                                                      #
+########################################################################################
 class ScreenV2:
     def __init__(self, table, actions):
+        """
+        [table]
+            * A mandatory parameter
+            * An instance of Table()
+        [actions]
+            * A mandatory parameter
+            * A list of instances of Action()
+        [shortcuts]
+            * An optional parameter
+        """
         # For internal use only
         self.movement_keys = {
             Key.DOWN: (0, 1),
@@ -28,7 +49,6 @@ class ScreenV2:
 
         # Start the infinite loop
         while True:
-
             # Get user action
             self.table.highlight, action = self.get_user_action()
 
@@ -49,9 +69,11 @@ class ScreenV2:
         if user_input != b"\x00":
             ...
 
+        # If user chooses "Enter"
         if user_input == Key.ENTER:
             action = True
 
+        # If user chooses one of the movement keys
         elif user_input in self.movement_keys:
             delta = self.movement_keys[user_input]
             new_position = [c1 + c2 for c1, c2 in zip(self.table.highlight, delta)]
@@ -112,3 +134,29 @@ class Key:
 
     S = b"s"
     S_RU = b"\xeb"
+
+
+########################################################################################
+#    HELPER FUNCTIONS                                                                  #
+########################################################################################
+def do_nothing():
+    pass
+
+
+def wait_for_key(target_key):
+    key = msvcrt.getch()
+    while key != target_key:
+        key = msvcrt.getch()
+
+
+def show_message(message, border=" ", centered=True, upper=True, wait_for_enter=True):
+    print(HIGHLIGHT)
+    print(f"{border * SCREEN_WIDTH}")
+    message = message.upper() if upper else message
+    text = message.center if centered else message.ljust
+    print(text(SCREEN_WIDTH))
+    print(f"{border * SCREEN_WIDTH}{END_HIGHLIGHT}")
+
+    if wait_for_enter:
+        print('\n Press "Enter" to continue...')
+        wait_for_key(Key.ENTER)
