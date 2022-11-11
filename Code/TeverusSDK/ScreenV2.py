@@ -27,14 +27,6 @@ class ScreenV2:
         [shortcuts]
             * An optional parameter
         """
-        # For internal use only
-        self.movement_keys = {
-            Key.DOWN: (0, 1),
-            Key.UP: (0, -1),
-            Key.RIGHT: (1, 0),
-            Key.LEFT: (-1, 0),
-        }
-
         self.table = table
         self.actions = actions
 
@@ -49,8 +41,30 @@ class ScreenV2:
 
         # Start the infinite loop
         while True:
-            # Get user action
-            self.table.highlight, action = self.get_user_action()
+            # Check if there is an immediate action expected
+            immediate_action = self.get_immediate_actions()
+
+            # Set action to immediate action if there is one
+            if immediate_action:
+                action = immediate_action
+
+            # Get user action if no immediate action is required
+            else:
+                self.table.highlight, action = self.get_user_action()
+
+            # If an action is expected, perform it
+            if action:
+
+                # Get the right action if Enter was pressed before
+                if isinstance(action, bool):
+                    action = self.get_table_action()
+
+                # Perform the action
+                action()
+
+                # Go back to the previous screen if this is expected
+                if action.go_back:
+                    break
 
             # Print the table with the new parameters
             self.table.print_table()
@@ -74,13 +88,28 @@ class ScreenV2:
             action = True
 
         # If user chooses one of the movement keys
-        elif user_input in self.movement_keys:
-            delta = self.movement_keys[user_input]
+        elif user_input in MOVEMENT_KEYS:
+            delta = MOVEMENT_KEYS[user_input]
             new_position = [c1 + c2 for c1, c2 in zip(self.table.highlight, delta)]
             if new_position in self.table.cage:
                 highlight = new_position
 
         return highlight, action
+
+    def get_table_action(self):
+        proper_actions = [[a] if not isinstance(a, list) else a for a in self.actions]
+        x, y = self.table.highlight
+        action = proper_actions[x][y]
+
+        return action
+
+    def get_immediate_actions(self):
+        immediate_actions = [a for a in self.actions if a.immediate_action]
+
+        if immediate_actions:
+            assert len(immediate_actions) == 1, "Too many immediate actions found!"
+
+            return immediate_actions[0]
 
 
 ########################################################################################
@@ -134,6 +163,14 @@ class Key:
 
     S = b"s"
     S_RU = b"\xeb"
+
+
+MOVEMENT_KEYS = {
+    Key.DOWN: (0, 1),
+    Key.UP: (0, -1),
+    Key.RIGHT: (1, 0),
+    Key.LEFT: (-1, 0),
+}
 
 
 ########################################################################################
