@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from Code.TeverusSDK.DataBase import DataBase
-from Code.TeverusSDK.ScreenV2 import show_message
+from Code.TeverusSDK.Screen import show_message
 
 
 class HideGame:

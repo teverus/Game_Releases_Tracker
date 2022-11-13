@@ -10,7 +10,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from webdriver_manager.chrome import ChromeDriverManager
 
 from Code.TeverusSDK.DataBase import DataBase
-from Code.TeverusSDK.ScreenV2 import show_message
+from Code.TeverusSDK.Screen import show_message
 
 COLUMNS = ["Title", "Day", "Month", "Year", "UnixReleaseDate", "Genre", "Hidden"]
 

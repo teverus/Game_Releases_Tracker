@@ -1,9 +1,9 @@
 from Code.Modules.UpdateGames import UpdateGames
-from Code.TeverusSDK.ScreenV2 import ScreenV2, Action, SCREEN_WIDTH
-from Code.TeverusSDK.TableV2 import TableV2
+from Code.TeverusSDK.Screen import Screen, Action, SCREEN_WIDTH
+from Code.TeverusSDK.Table import Table
 
 
-class CheckNewGamesOnIGNScreen(ScreenV2):
+class CheckNewGamesOnIGNScreen(Screen):
     def __init__(self):
         self.actions = [
             Action(
@@ -14,7 +14,7 @@ class CheckNewGamesOnIGNScreen(ScreenV2):
             )
         ]
 
-        self.table = TableV2(
+        self.table = Table(
             table_title="Check new games on IGN",
             rows=[action.name for action in self.actions],
             highlight=False,

@@ -1,8 +1,7 @@
-from Code.Screens.old.z_CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
+from Code.Screens.CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
 from Code.Screens.ThisMonthsReleasesScreen import ThisMonthsReleasesScreen
-from Code.TeverusSDK.old.z_Screen import Screen, Action, SCREEN_WIDTH
-from Code.TeverusSDK.old.z_Table import Table
-from Code.TeverusSDK.TableV2 import TableV2
+from Code.TeverusSDK.Screen import Screen, SCREEN_WIDTH, Action
+from Code.TeverusSDK.Table import Table
 
 
 class WelcomeScreen(Screen):
@@ -18,15 +17,6 @@ class WelcomeScreen(Screen):
             table_title="Game releases tracker",
             rows=[action.name for action in self.actions],
             rows_bottom_border=False,
-            table_width=SCREEN_WIDTH,
-            footer_bottom_border=False,
-        )
-
-        self.table2 = TableV2(
-            table_title="Game releases tracker",
-            rows=[action.name for action in self.actions],
-            rows_bottom_border=False,
-            footer_bottom_border=False,
             table_width=SCREEN_WIDTH,
         )
 

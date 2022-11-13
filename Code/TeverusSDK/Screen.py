@@ -3,10 +3,11 @@ import os
 
 import bext
 
+from Code.TeverusSDK.Table import HIGHLIGHT, END_HIGHLIGHT
+
 ########################################################################################
 #    SCREEN CONFIGS                                                                    #
 ########################################################################################
-from Code.TeverusSDK.TableV2 import HIGHLIGHT, END_HIGHLIGHT
 
 SCREEN_WIDTH = 99
 GO_BACK = "[Q] Go back    "
@@ -15,7 +16,7 @@ GO_BACK = "[Q] Go back    "
 ########################################################################################
 #    SCREEN CLASS                                                                      #
 ########################################################################################
-class ScreenV2:
+class Screen:
     def __init__(self, table, actions):
         """
         [table]
@@ -41,6 +42,7 @@ class ScreenV2:
 
         # Start the infinite loop
         while True:
+
             # Check if there is an immediate action expected
             immediate_action = self.get_immediate_actions()
 
@@ -56,8 +58,7 @@ class ScreenV2:
             if action:
 
                 # Get the right action if Enter was pressed before
-                if isinstance(action, bool):
-                    action = self.get_table_action()
+                action = self.get_table_action() if isinstance(action, bool) else action
 
                 # Perform the action
                 action()
@@ -73,6 +74,7 @@ class ScreenV2:
     #   INTERNAL OPERATIONS                                                            #
     ####################################################################################
     def get_user_action(self):
+
         # Variables that will be returned
         highlight = self.table.highlight
         action = False
@@ -80,6 +82,7 @@ class ScreenV2:
         # Get actual user input
         user_input = msvcrt.getch()
 
+        # For debugging purposes only
         if user_input != b"\x00":
             ...
 
@@ -88,18 +91,31 @@ class ScreenV2:
             action = True
 
         # If user chooses one of the movement keys
-        elif user_input in MOVEMENT_KEYS:
-            delta = MOVEMENT_KEYS[user_input]
+        elif user_input in MOVEMENT:
+            delta = MOVEMENT[user_input]
             new_position = [c1 + c2 for c1, c2 in zip(self.table.highlight, delta)]
             if new_position in self.table.cage:
                 highlight = new_position
 
+        elif user_input in PAGINATION.keys() and self.table.has_multiple_pages:
+            delta = PAGINATION[user_input]
+            go_before = delta == -1 and self.table.current_page == 1
+            go_beyond = delta == 1 and self.table.current_page == self.table.max_page
+            if not go_before and not go_beyond:
+                self.table.current_page += delta
+                highlight = [0, 0]
+
         return highlight, action
 
     def get_table_action(self):
-        proper_actions = [[a] if not isinstance(a, list) else a for a in self.actions]
         x, y = self.table.highlight
-        action = proper_actions[x][y]
+        proper_actions = [[a] if not isinstance(a, list) else a for a in self.actions]
+        proper_page = self.table.current_page - 1
+        y += proper_page * self.table.max_rows
+        try:
+            action = proper_actions[y][x]
+        except IndexError:
+            action = Action(function=do_nothing)
 
         return action
 
@@ -165,12 +181,8 @@ class Key:
     S_RU = b"\xeb"
 
 
-MOVEMENT_KEYS = {
-    Key.DOWN: (0, 1),
-    Key.UP: (0, -1),
-    Key.RIGHT: (1, 0),
-    Key.LEFT: (-1, 0),
-}
+MOVEMENT = {Key.DOWN: (0, 1), Key.UP: (0, -1), Key.RIGHT: (1, 0), Key.LEFT: (-1, 0)}
+PAGINATION = {Key.Z: -1, Key.Z_RU: -1, Key.X: 1, Key.X_RU: 1}
 
 
 ########################################################################################

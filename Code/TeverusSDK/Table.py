@@ -1,4 +1,5 @@
 import os
+from math import ceil
 
 import bext
 from colorama import Back, Fore
@@ -12,7 +13,7 @@ class ColumnWidth:
     FIT = "Fit"
 
 
-class TableV2:
+class Table:
     def __init__(
         self,
         # Rows
@@ -68,6 +69,8 @@ class TableV2:
         self.current_page = current_page
         self.max_rows = self.get_max_rows(max_rows)
         self.max_columns = self.get_max_columns(max_columns)
+        self.has_multiple_pages = self.get_multiple_pages()
+        self.max_page = self.get_max_page()
         self.cage = self.get_cage()
 
         # Calculated values
@@ -117,7 +120,20 @@ class TableV2:
 
         # Print footer if any
         if self.footer:
-            ...
+            for action in self.footer:
+                line = action.name
+                line = line.center(self.table_width) if self.footer_centered else line
+                print(line)
+
+        # Print pagination is needed
+        if self.has_multiple_pages:
+            arrow_l = "        " if self.current_page == 1 else "[Z] <<< "
+            arrow_r = "        " if self.current_page == self.max_page else " >>> [X]"
+
+            pag = f"{arrow_l}[{self.current_page:02}/{self.max_page:02}]{arrow_r}"
+            pag = pag.center(self.table_width)
+
+            print(pag)
 
     ####################################################################################
     #    TABLE CALCULATIONS                                                            #
@@ -200,13 +216,24 @@ class TableV2:
         return column_widths
 
     def get_visible_rows(self):
-        result = None
+        result = self.rows
 
-        if len(self.rows) > self.max_rows:
-            ...
+        if self.has_multiple_pages:
+            previous_page = self.current_page - 1
+            start = self.max_rows * previous_page
+            end = self.max_rows * self.current_page
 
-        else:
-            result = self.rows
+            pack = self.rows[start:end]
+
+            if len(pack) != self.max_rows:
+                diff = self.max_rows - len(pack)
+                if self.max_columns == 1:
+                    for _ in range(diff):
+                        pack.append([""])
+                else:
+                    raise NotImplementedError()
+
+            result = pack
 
         return result
 
@@ -220,3 +247,14 @@ class TableV2:
                 coordinates.append([x, y])
 
         return coordinates
+
+    def get_max_page(self):
+        if self.has_multiple_pages:
+            max_page = ceil(len(self.rows) / self.max_rows)
+
+            return max_page
+
+    def get_multiple_pages(self):
+        is_multiple_pages = bool(len(self.rows) > self.max_rows)
+
+        return is_multiple_pages
