@@ -120,7 +120,12 @@ class Screen:
         return action
 
     def get_immediate_actions(self):
-        immediate_actions = [a for a in self.actions if a.immediate_action]
+        immediate_actions = []
+        for action in self.actions:
+            action = [action] if not isinstance(action, list) else action
+            for sub_action in action:
+                if sub_action.immediate_action:
+                    immediate_actions.append(sub_action)
 
         if immediate_actions:
             assert len(immediate_actions) == 1, "Too many immediate actions found!"

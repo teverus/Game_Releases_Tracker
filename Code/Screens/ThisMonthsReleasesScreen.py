@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
+from Code.Modules.HideGame import HideGame
 from Code.Modules.OpenInSteam import OpenInSteam
 from Code.TeverusSDK.DataBase import DataBase
 from Code.TeverusSDK.Screen import Screen, Action, SCREEN_WIDTH, GO_BACK, do_nothing
@@ -14,15 +15,27 @@ class ThisMonthsReleasesScreen(Screen):
         self.rows = self.get_rows(remove_hidden=True)
 
         self.actions = [
-            Action(name=row, function=OpenInSteam, arguments={"game_title": row})
+            [
+                Action(
+                    name=row,
+                    function=OpenInSteam,
+                    arguments={"game_title": row},
+                ),
+                Action(
+                    name="Hide",
+                    function=HideGame,
+                    arguments={"game_title": row, "main": self},
+                ),
+            ]
             for row in self.rows
         ]
 
         self.table = Table(
             table_title="This month's releases",
-            rows=[action.name for action in self.actions],
+            rows=[[action[0].name, action[1].name] for action in self.actions],
             table_width=SCREEN_WIDTH,
             max_rows=29,
+            column_widths={0: ColumnWidth.FIT, 1: ColumnWidth.FULL},
             footer=[
                 Action(
                     name=GO_BACK, function=do_nothing, go_back=True, is_shortcut=True

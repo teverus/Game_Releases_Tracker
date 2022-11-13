@@ -189,13 +189,12 @@ class Table:
         for col_index, width_type in expected_widths.items():
             if self.table_width:
                 if width_type == ColumnWidth.FIT:
-                    # target_length = max(
-                    #     [
-                    #         len(row[col_index]) if isinstance(row, list) else len(row)
-                    #         for row in self.rows
-                    #     ]
-                    # )
-                    ...
+                    target_length = max(
+                        [
+                            len(row[col_index]) if isinstance(row, list) else len(row)
+                            for row in self.visible_rows
+                        ]
+                    )
                 else:
                     if not full_target_length:
                         already_used = sum([v for v in column_widths.values()])
@@ -227,11 +226,9 @@ class Table:
 
             if len(pack) != self.max_rows:
                 diff = self.max_rows - len(pack)
-                if self.max_columns == 1:
-                    for _ in range(diff):
-                        pack.append([""])
-                else:
-                    raise NotImplementedError()
+                for _ in range(diff):
+                    dummy = ["" for __ in range(self.max_columns)]
+                    pack.append(dummy)
 
             result = pack
 
