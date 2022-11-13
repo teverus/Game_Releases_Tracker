@@ -1,4 +1,5 @@
 import webbrowser
+from urllib.parse import quote
 
 from bs4 import BeautifulSoup
 from requests import get
@@ -7,6 +8,7 @@ from requests import get
 class OpenInSteam:
     def __init__(self, game_title):
         game_title = game_title.strip().split(" | ")[-1]
+        game_title = quote(game_title)
 
         response = get(url=f"https://www.google.com/search?q={game_title} Steam")
         response.raise_for_status()
