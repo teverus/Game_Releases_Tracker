@@ -1,6 +1,9 @@
 """
-# TODO !!   [S] Show hidden
-# TODO !    Split database into two tables
+# TODO !!   [S] Show/Exclude hidden
+    * Убрать достаточно игр, показать игры, открыть последнюю страницу, убрать игры
+    * Не уменьшается максимальное количество страниц, если убрать достаточно игр
+# TODO !    Hide -> Unhide для скрытых игр
+# TODO      Split database into two tables
 """
 
 from Code.Screens.CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen

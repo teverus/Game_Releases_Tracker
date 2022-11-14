@@ -3,6 +3,7 @@ from pathlib import Path
 
 from Code.Modules.HideGame import HideGame
 from Code.Modules.OpenInSteam import OpenInSteam
+from Code.Modules.ShowHiddenReleases import ShowHiddenReleases
 from Code.TeverusSDK.DataBase import DataBase
 from Code.TeverusSDK.Screen import (
     Screen,
@@ -17,6 +18,9 @@ from Code.TeverusSDK.Table import Table, ColumnWidth
 
 class ThisMonthsReleasesScreen(Screen):
     def __init__(self):
+        self.SHOW_HIDDEN = "[S] Show hidden"
+        self.EXCLUDE_HIDDEN = "[S] Exclude hidden"
+
         self.db = None
         self.df = None
         self.rows = self.get_rows(remove_hidden=True)
@@ -51,8 +55,9 @@ class ThisMonthsReleasesScreen(Screen):
                     shortcut=[Key.Q, Key.Q_RU],
                 ),
                 Action(
-                    name="[S] Show hidden",
-                    function=do_nothing,
+                    name=self.SHOW_HIDDEN,
+                    function=ShowHiddenReleases,
+                    arguments={"main": self},
                     shortcut=[Key.S, Key.S_RU],
                 ),
             ],
