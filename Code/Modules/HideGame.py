@@ -20,7 +20,7 @@ class HideGame:
         self.database.write_to_table(self.df)
 
     def get_target_index(self, main):
-        for row_index, row in enumerate(main.table.rows_raw):
+        for row_index, row in enumerate(main.table.visible_rows):
             row = [row] if not isinstance(row, list) else row
             for element in row:
                 if self.title in element:
@@ -30,9 +30,9 @@ class HideGame:
         target_index = self.get_target_index(main)
 
         if target_index is not None:
-            del main.table.rows_raw[target_index]
+            del main.table.rows[target_index]
             del main.actions[target_index]
-            x, _ = main.table.highlight
+            x, y = main.table.highlight
             main.table.highlight = [x, 0]
         else:
-            raise Exception(f"No {self.title} in\n{main.table.rows_raw = }")
+            raise Exception(f"No {self.title} in\n{main.table.visible_rows = }")

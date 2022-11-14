@@ -4,7 +4,14 @@ from pathlib import Path
 from Code.Modules.HideGame import HideGame
 from Code.Modules.OpenInSteam import OpenInSteam
 from Code.TeverusSDK.DataBase import DataBase
-from Code.TeverusSDK.Screen import Screen, Action, SCREEN_WIDTH, GO_BACK, do_nothing
+from Code.TeverusSDK.Screen import (
+    Screen,
+    Action,
+    SCREEN_WIDTH,
+    GO_BACK,
+    do_nothing,
+    Key,
+)
 from Code.TeverusSDK.Table import Table, ColumnWidth
 
 
@@ -38,13 +45,24 @@ class ThisMonthsReleasesScreen(Screen):
             column_widths={0: ColumnWidth.FIT, 1: ColumnWidth.FULL},
             footer=[
                 Action(
-                    name=GO_BACK, function=do_nothing, go_back=True, is_shortcut=True
+                    name=GO_BACK,
+                    function=do_nothing,
+                    go_back=True,
+                    shortcut=[Key.Q, Key.Q_RU],
                 ),
-                Action(name="[S] Show hidden", function=do_nothing, is_shortcut=True),
+                Action(
+                    name="[S] Show hidden",
+                    function=do_nothing,
+                    shortcut=[Key.S, Key.S_RU],
+                ),
             ],
         )
 
         super(ThisMonthsReleasesScreen, self).__init__(self.table, self.actions)
+
+    ####################################################################################
+    #    SCREEN SPECIFIC ACTIONS                                                       #
+    ####################################################################################
 
     def get_rows(self, remove_hidden=False):
         day = datetime.today().strftime("%d").rjust(2, "0")

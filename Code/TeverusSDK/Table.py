@@ -103,13 +103,13 @@ class Table:
 
         # Print rows, highlighting them if necessary
         self.visible_rows = self.get_visible_rows()
-        for index_y, row in enumerate(self.visible_rows):
+        for x, row in enumerate(self.visible_rows):
             line = []
-            for index_x, cell in enumerate(row):
-                target_width = self.column_widths[index_x]
+            for y, cell in enumerate(row):
+                target_width = self.column_widths[y]
                 cell = cell.center(target_width) if self.rows_centered else cell
                 highlighted = f"{HIGHLIGHT}{cell}{END_HIGHLIGHT}"
-                data = highlighted if [index_x, index_y] == self.highlight else cell
+                data = highlighted if [x, y] == self.highlight else cell
                 line.append(data)
             line = " | ".join(line)
             print(f" {line} ")
@@ -235,12 +235,12 @@ class Table:
         return result
 
     def get_cage(self):
-        x_axis = [number for number in range(self.max_columns)]
-        y_axis = [number for number in range(self.max_rows)]
+        x_axis = [number for number in range(self.max_rows)]
+        y_axis = [number for number in range(self.max_columns)]
 
         coordinates = []
-        for y in y_axis:
-            for x in x_axis:
+        for x in x_axis:
+            for y in y_axis:
                 coordinates.append([x, y])
 
         return coordinates

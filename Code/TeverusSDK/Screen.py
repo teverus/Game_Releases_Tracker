@@ -1,9 +1,10 @@
 import msvcrt
 import os
+from typing import Union
 
 import bext
 
-from Code.TeverusSDK.Table import HIGHLIGHT, END_HIGHLIGHT
+from Code.TeverusSDK.Table import HIGHLIGHT, END_HIGHLIGHT, Table
 
 ########################################################################################
 #    SCREEN CONFIGS                                                                    #
@@ -14,30 +15,60 @@ GO_BACK = "[Q] Go back    "
 
 
 ########################################################################################
-#    SCREEN CLASS                                                                      #
+#    ACTION                                                                            #
 ########################################################################################
+
+
+class Action:
+    def __init__(
+        self,
+        name=None,
+        function=None,
+        arguments=None,
+        immediate_action=False,
+        go_back=False,
+        shortcut=False,
+    ):
+        """
+        [arguments]
+            * A dict where key is the name of the argument in the function,
+            value - the actual value
+            * Key and the name of the argument must be identical
+            * Example: {"game_title": row}
+        """
+        self.name = name
+        self.function = function
+        self.arguments = arguments
+        self.immediate_action = immediate_action
+        self.go_back = go_back
+        self.shortcut = shortcut
+
+    def __call__(self, *args, **kwargs):
+        if self.arguments:
+            self.function(**self.arguments)
+        else:
+            self.function()
+
+
+########################################################################################
+#    SCREEN                                                                            #
+########################################################################################
+
+
 class Screen:
-    def __init__(self, table, actions):
-        """
-        [table]
-            * A mandatory parameter
-            * An instance of Table()
-        [actions]
-            * A mandatory parameter
-            * A list of instances of Action()
-        [shortcuts]
-            * An optional parameter
-        """
+    def __init__(self, table: Table, actions: Union[list[Action] | list[list[Action]]]):
         self.table = table
         self.actions = actions
 
-        # Set default highlight position
+        # Set default highlight position if none was set before
         if self.table.highlight is None:
             self.table.highlight = [0, 0]
 
-        # Print the table
+        # Clear the console
         os.system("cls")
         bext.hide()
+
+        # Print the table
         self.table.print_table()
 
         # Start the infinite loop
@@ -75,6 +106,8 @@ class Screen:
     ####################################################################################
     def get_user_action(self):
 
+        screen_specific_shortcuts = self.get_screen_specific_shortcuts()
+
         # Variables that will be returned
         highlight = self.table.highlight
         action = False
@@ -86,24 +119,27 @@ class Screen:
         if user_input != b"\x00":
             ...
 
-        # If user chooses "Enter"
+        # If the user chooses "Enter"
         if user_input == Key.ENTER:
             action = True
 
-        # If user chooses one of the movement keys
+        # If the user chooses one of the movement keys
         elif user_input in MOVEMENT:
             delta = MOVEMENT[user_input]
             new_position = [c1 + c2 for c1, c2 in zip(self.table.highlight, delta)]
             if new_position in self.table.cage:
                 highlight = new_position
 
+        # If the user chooses one of the page changing keys
         elif user_input in PAGINATION.keys() and self.table.has_multiple_pages:
             delta = PAGINATION[user_input]
             go_before = delta == -1 and self.table.current_page == 1
             go_beyond = delta == 1 and self.table.current_page == self.table.max_page
             if not go_before and not go_beyond:
                 self.table.current_page += delta
-                highlight = [0, 0]
+
+        elif user_input in screen_specific_shortcuts.keys():
+            action = screen_specific_shortcuts[user_input]
 
         return highlight, action
 
@@ -111,9 +147,9 @@ class Screen:
         x, y = self.table.highlight
         proper_actions = [[a] if not isinstance(a, list) else a for a in self.actions]
         proper_page = self.table.current_page - 1
-        y += proper_page * self.table.max_rows
+        x += proper_page * self.table.max_rows
         try:
-            action = proper_actions[y][x]
+            action = proper_actions[x][y]
         except IndexError:
             action = Action(function=do_nothing)
 
@@ -132,39 +168,21 @@ class Screen:
 
             return immediate_actions[0]
 
+    def get_screen_specific_shortcuts(self):
+        result = {}
+
+        if self.table.footer:
+            actions_with_shortcuts = [a for a in self.table.footer if a.shortcut]
+            for action in actions_with_shortcuts:
+                for key in action.shortcut:
+                    result[key] = action
+
+        return result
+
 
 ########################################################################################
-#    CLASSES RELATED TO SCREEN                                                         #
+#    INFO RELATED TO SCREEN                                                            #
 ########################################################################################
-class Action:
-    def __init__(
-        self,
-        name=None,
-        function=None,
-        arguments=None,
-        immediate_action=False,
-        go_back=False,
-        is_shortcut=False,
-    ):
-        """
-        [arguments]
-            * A dict where key is the name of the argument in the function,
-            value - the actual value
-            * Key and the name of the argument must be identical
-            * Example: {"game_title": row}
-        """
-        self.name = name
-        self.function = function
-        self.arguments = arguments
-        self.immediate_action = immediate_action
-        self.go_back = go_back
-        self.is_shortcut = is_shortcut
-
-    def __call__(self, *args, **kwargs):
-        if self.arguments:
-            self.function(**self.arguments)
-        else:
-            self.function()
 
 
 class Key:
@@ -186,13 +204,15 @@ class Key:
     S_RU = b"\xeb"
 
 
-MOVEMENT = {Key.DOWN: (0, 1), Key.UP: (0, -1), Key.RIGHT: (1, 0), Key.LEFT: (-1, 0)}
+MOVEMENT = {Key.DOWN: (1, 0), Key.UP: (-1, 0), Key.RIGHT: (0, 1), Key.LEFT: (0, -1)}
 PAGINATION = {Key.Z: -1, Key.Z_RU: -1, Key.X: 1, Key.X_RU: 1}
 
 
 ########################################################################################
 #    HELPER FUNCTIONS                                                                  #
 ########################################################################################
+
+
 def do_nothing():
     pass
 

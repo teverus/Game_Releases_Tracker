@@ -98,7 +98,6 @@
 #         mv = {Key.DOWN: (1, 0), Key.UP: (-1, 0), Key.RIGHT: (0, 1), Key.LEFT: (0, -1)}
 #
 #         # [2-2] Declare default shortcut keys
-#         # TODO ! Вот тут надо что-то придумать
 #         default_shortcuts = [
 #             # Go back
 #             # Key.Q,

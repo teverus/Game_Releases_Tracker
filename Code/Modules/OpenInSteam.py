@@ -19,4 +19,7 @@ class OpenInSteam:
                 steam_link = link.attrs["href"].split("q=")[-1].split("&sa=")[0]
                 break
 
-        webbrowser.open(steam_link)
+        try:
+            webbrowser.open(steam_link)
+        except Exception:
+            raise Exception(f"Couldn't open {steam_link}")
