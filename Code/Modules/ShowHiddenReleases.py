@@ -8,50 +8,8 @@ class ShowHiddenReleases:
     def __init__(self, main):
         action_name, hidden_status, index = self.get_opposite_action(main)
 
-        rows = main.get_rows(remove_hidden=hidden_status)
-
-        actions = [
-            [
-                Action(
-                    name=row,
-                    function=OpenInSteam,
-                    arguments={"game_title": row},
-                ),
-                Action(
-                    name="Hide",
-                    function=HideGame,
-                    arguments={"game_title": row, "main": main},
-                ),
-            ]
-            for row in rows
-        ]
-
-        current_page = main.table.current_page
-        highlight = main.table.highlight
-
-        table = Table(
-            table_title="This month's releases",
-            rows=[[action[0].name, action[1].name] for action in actions],
-            table_width=SCREEN_WIDTH,
-            max_rows=29,
-            current_page=current_page,
-            highlight=highlight,
-            column_widths={0: ColumnWidth.FIT, 1: ColumnWidth.FULL},
-            footer=[
-                Action(
-                    name=GO_BACK,
-                    function=do_nothing,
-                    go_back=True,
-                    shortcut=[Key.Q, Key.Q_RU],
-                ),
-                Action(
-                    name="[S] Show hidden",
-                    function=ShowHiddenReleases,
-                    arguments={"main": main},
-                    shortcut=[Key.S, Key.S_RU],
-                ),
-            ],
-        )
+        actions = main.get_actions(remove_hidden=hidden_status, main=main)
+        table = main.get_table(actions, main)
 
         main.actions = actions
         main.table = table
@@ -60,13 +18,14 @@ class ShowHiddenReleases:
     ####################################################################################
     #    HELPERS
     ####################################################################################
+
     @staticmethod
     def get_opposite_action(main):
         footer = main.table.footer
         name = 0
         status = 1
 
-        opposite_name = {
+        opposite = {
             main.SHOW_HIDDEN: [main.EXCLUDE_HIDDEN, False],
             main.EXCLUDE_HIDDEN: [main.SHOW_HIDDEN, True],
         }
@@ -74,9 +33,10 @@ class ShowHiddenReleases:
         show_action = [a for a in footer if a.name == main.SHOW_HIDDEN]
         hide_action = [a for a in footer if a.name == main.EXCLUDE_HIDDEN]
         current_action = [a for a in [show_action, hide_action] if a][0][0]
+        current_action = current_action.name
 
-        action_name = opposite_name[current_action.name][name]
-        hidden_status = opposite_name[current_action.name][status]
-        index = [i for i, a in enumerate(footer) if a.name == current_action.name][0]
+        action_name = opposite[current_action][name]
+        hidden_status = opposite[current_action][status]
+        index = [i for i, a in enumerate(footer) if a.name == current_action][0]
 
         return action_name, hidden_status, index
