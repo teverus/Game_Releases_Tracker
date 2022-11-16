@@ -1,5 +1,4 @@
 """
-# TODO !    Hide -> Unhide для скрытых игр
 # TODO      Split database into two tables
 """
 

@@ -7,7 +7,6 @@ from requests import get
 
 class OpenInSteam:
     def __init__(self, game_title):
-        game_title = game_title.strip().split(" | ")[-1]
         game_title = quote(game_title)
 
         response = get(url=f"https://www.google.com/search?q={game_title} Steam")

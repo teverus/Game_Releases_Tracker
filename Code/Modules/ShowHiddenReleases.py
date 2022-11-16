@@ -1,4 +1,4 @@
-from Code.Modules.HideGame import HideGame
+from Code.Modules.ChangeGameStatus import ChangeGameStatus
 from Code.Modules.OpenInSteam import OpenInSteam
 from Code.TeverusSDK.Screen import Action, SCREEN_WIDTH, GO_BACK, do_nothing, Key
 from Code.TeverusSDK.Table import Table, ColumnWidth

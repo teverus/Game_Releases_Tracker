@@ -1,7 +1,8 @@
+import re
 from datetime import datetime
 from pathlib import Path
 
-from Code.Modules.HideGame import HideGame
+from Code.Modules.ChangeGameStatus import ChangeGameStatus
 from Code.Modules.OpenInSteam import OpenInSteam
 from Code.Modules.ShowHiddenReleases import ShowHiddenReleases
 from Code.TeverusSDK.DataBase import DataBase
@@ -46,46 +47,46 @@ class ThisMonthsReleasesScreen(Screen):
 
         df.reset_index(drop=True, inplace=True)
 
-        games = {}
-        for index in range(len(df)):
-            game = df.loc[index]
-            title = game.Title
-            day_ = "?? " if not game.Day else f"{game.Day.rjust(2, '0')} "
-            date = f"{day_}{game.Month.capitalize()} {game.Year}"
-            games[title] = date
-
         wall = 3
         side_padding = 2
         hide = 8
 
-        rows = []
-        for title, date in games.items():
+        games = {}
+        for index in range(len(df)):
+            game = df.loc[index]
+            title = game.Title
+            hidden = bool(int(game.Hidden))
+            day_ = "??" if not game.Day else f"{game.Day.rjust(2, '0')}"
+            date = f"{day_} {game.Month.capitalize()} {game.Year}"
+
             mark = ">>> " if date == today else "    "
             mark_and_date = f"{mark}[{date}"
             main_col_width = len(mark_and_date) + (wall * 2) + side_padding + hide
             line = f"{mark_and_date}] {title.ljust(SCREEN_WIDTH - main_col_width)}"
-            rows.append(line)
+            games[line] = hidden
 
-        return rows
+        return games
 
     def get_actions(self, remove_hidden, main):
         rows = self.get_rows(remove_hidden=remove_hidden)
 
-        actions = [
-            [
-                Action(
-                    name=row,
-                    function=OpenInSteam,
-                    arguments={"game_title": row},
-                ),
-                Action(
-                    name="  Hide  ",
-                    function=HideGame,
-                    arguments={"game_title": row, "main": main},
-                ),
-            ]
-            for row in rows
-        ]
+        actions = []
+        for game, hidden in rows.items():
+            game_title = re.findall(r".*\[.*\].(.*)", game)[0].strip()
+
+            main_action = Action(
+                name=game,
+                function=OpenInSteam,
+                arguments={"game_title": game_title},
+            )
+
+            secondary_action = Action(
+                name="  Hide  " if not hidden else " Unhide ",
+                function=ChangeGameStatus,
+                arguments={"game_title": game_title, "main": main, "status": hidden},
+            )
+
+            actions.append([main_action, secondary_action])
 
         return actions
 
