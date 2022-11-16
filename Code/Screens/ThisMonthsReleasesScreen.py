@@ -21,6 +21,7 @@ class ThisMonthsReleasesScreen(Screen):
     def __init__(self):
         self.SHOW_HIDDEN = "[S] Show hidden"
         self.EXCLUDE_HIDDEN = "[S] Exclude hidden"
+        self.database = DataBase(Path("Files/GameReleases.db"))
 
         self.actions = self.get_actions(remove_hidden=True, main=self)
 
@@ -32,15 +33,13 @@ class ThisMonthsReleasesScreen(Screen):
     #    SCREEN SPECIFIC ACTIONS                                                       #
     ####################################################################################
 
-    @staticmethod
-    def get_rows(remove_hidden=False):
+    def get_rows(self, remove_hidden=False):
         day = datetime.today().strftime("%d").rjust(2, "0")
         month = datetime.today().strftime("%b").upper()
         year = datetime.today().strftime("%Y")
         today = f"{day} {month.capitalize()} {year}"
 
-        db = DataBase(Path("Files/GameReleases.db"))
-        df = db.read_table()
+        df = self.database.read_table()
 
         df = df.loc[df.Month == month]
         df = df.loc[df.Hidden == "0"] if remove_hidden else df
