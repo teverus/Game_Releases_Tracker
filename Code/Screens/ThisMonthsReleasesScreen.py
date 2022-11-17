@@ -30,41 +30,8 @@ class ThisMonthsReleasesScreen(Screen):
         super(ThisMonthsReleasesScreen, self).__init__(self.table, self.actions)
 
     ####################################################################################
-    #    SCREEN SPECIFIC ACTIONS                                                       #
+    #    PRIMARY ACTIONS                                                               #
     ####################################################################################
-
-    def get_rows(self, remove_hidden=False):
-        day = datetime.today().strftime("%d").rjust(2, "0")
-        month = datetime.today().strftime("%b").upper()
-        year = datetime.today().strftime("%Y")
-        today = f"{day} {month.capitalize()} {year}"
-
-        df = self.database.read_table()
-
-        df = df.loc[df.Month == month]
-        df = df.loc[df.Hidden == "0"] if remove_hidden else df
-
-        df.reset_index(drop=True, inplace=True)
-
-        wall = 3
-        side_padding = 2
-        hide = 8
-
-        games = {}
-        for index in range(len(df)):
-            game = df.loc[index]
-            title = game.Title
-            hidden = bool(int(game.Hidden))
-            day_ = "??" if not game.Day else f"{game.Day.rjust(2, '0')}"
-            date = f"{day_} {game.Month.capitalize()} {game.Year}"
-
-            mark = ">>> " if date == today else "    "
-            mark_and_date = f"{mark}[{date}"
-            main_col_width = len(mark_and_date) + (wall * 2) + side_padding + hide
-            line = f"{mark_and_date}] {title.ljust(SCREEN_WIDTH - main_col_width)}"
-            games[line] = hidden
-
-        return games
 
     def get_actions(self, remove_hidden, main):
         rows = self.get_rows(remove_hidden=remove_hidden)
@@ -114,3 +81,39 @@ class ThisMonthsReleasesScreen(Screen):
         )
 
         return table
+
+    ####################################################################################
+    #    HELPERS                                                                       #
+    ####################################################################################
+    def get_rows(self, remove_hidden=False):
+        day = datetime.today().strftime("%d").rjust(2, "0")
+        month = datetime.today().strftime("%b").upper()
+        year = datetime.today().strftime("%Y")
+        today = f"{day} {month.capitalize()} {year}"
+
+        df = self.database.read_table()
+
+        df = df.loc[df.Month == month]
+        df = df.loc[df.Hidden == "0"] if remove_hidden else df
+
+        df.reset_index(drop=True, inplace=True)
+
+        wall = 3
+        side_padding = 2
+        hide = 8
+
+        games = {}
+        for index in range(len(df)):
+            game = df.loc[index]
+            title = game.Title
+            hidden = bool(int(game.Hidden))
+            day_ = "??" if not game.Day else f"{game.Day.rjust(2, '0')}"
+            date = f"{day_} {game.Month.capitalize()} {game.Year}"
+
+            mark = ">>> " if date == today else "    "
+            mark_and_date = f"{mark}[{date}"
+            main_col_width = len(mark_and_date) + (wall * 2) + side_padding + hide
+            line = f"{mark_and_date}] {title.ljust(SCREEN_WIDTH - main_col_width)}"
+            games[line] = hidden
+
+        return games

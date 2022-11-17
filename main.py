@@ -1,7 +1,3 @@
-"""
-# TODO      Split database into two tables
-"""
-
 from Code.Screens.CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
 from Code.Screens.ThisMonthsReleasesScreen import ThisMonthsReleasesScreen
 from Code.TeverusSDK.Screen import Screen, SCREEN_WIDTH, Action
