@@ -53,6 +53,7 @@ class ChangeGameStatus:
         main.table.highlight = [x, 0]
 
         main.table.max_page = main.table.get_max_page()
+        main.table.has_multiple_pages = main.table.get_multiple_pages()
 
     def change_table_title(self, main):
         if not self.game_is_hidden:
