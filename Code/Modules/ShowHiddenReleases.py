@@ -1,9 +1,3 @@
-from Code.Modules.ChangeGameStatus import ChangeGameStatus
-from Code.Modules.OpenInSteam import OpenInSteam
-from Code.TeverusSDK.Screen import Action, SCREEN_WIDTH, GO_BACK, do_nothing, Key
-from Code.TeverusSDK.Table import Table, ColumnWidth
-
-
 class ShowHiddenReleases:
     def __init__(self, main):
         action_name, hidden_status, index = self.get_opposite_action(main)

@@ -11,7 +11,7 @@ from Code.TeverusSDK.Table import HIGHLIGHT, END_HIGHLIGHT, Table
 ########################################################################################
 
 SCREEN_WIDTH = 99
-GO_BACK = "[Q] Go back    "
+GO_BACK_TEXT = "[Q] Go back    "
 
 
 ########################################################################################
@@ -27,7 +27,7 @@ class Action:
         arguments=None,
         immediate_action=False,
         go_back=False,
-        shortcut=False,
+        shortcut: Union[bool, list] = False,
     ):
         """
         [arguments]
@@ -234,3 +234,15 @@ def show_message(message, border=" ", centered=True, upper=True, wait_for_enter=
     if wait_for_enter:
         print('\n Press "Enter" to continue...')
         wait_for_key(Key.ENTER)
+
+
+########################################################################################
+#    POPULAR ACTIONS                                                                   #
+########################################################################################
+
+GO_BACK_ACTION = Action(
+    name=GO_BACK_TEXT,
+    function=do_nothing,
+    go_back=True,
+    shortcut=[Key.Q, Key.Q_RU],
+)

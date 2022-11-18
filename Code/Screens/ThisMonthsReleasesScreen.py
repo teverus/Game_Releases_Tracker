@@ -10,9 +10,10 @@ from Code.TeverusSDK.Screen import (
     Screen,
     Action,
     SCREEN_WIDTH,
-    GO_BACK,
+    GO_BACK_TEXT,
     do_nothing,
     Key,
+    GO_BACK_ACTION,
 )
 from Code.TeverusSDK.Table import Table, ColumnWidth
 
@@ -65,12 +66,7 @@ class ThisMonthsReleasesScreen(Screen):
             highlight=[0, 0],
             column_widths={0: ColumnWidth.FULL, 1: ColumnWidth.FIT},
             footer=[
-                Action(
-                    name=GO_BACK,
-                    function=do_nothing,
-                    go_back=True,
-                    shortcut=[Key.Q, Key.Q_RU],
-                ),
+                GO_BACK_ACTION,
                 Action(
                     name=self.SHOW_HIDDEN,
                     function=ShowHiddenReleases,
@@ -93,7 +89,7 @@ class ThisMonthsReleasesScreen(Screen):
 
         df = self.database.read_table()
 
-        df = df.loc[df.Month == month]
+        df = df.loc[df.MonthAndYear == f"{month} {year}"]
         df = df.loc[df.Hidden == "0"] if remove_hidden else df
 
         df.reset_index(drop=True, inplace=True)
@@ -108,7 +104,7 @@ class ThisMonthsReleasesScreen(Screen):
             title = game.Title
             hidden = bool(int(game.Hidden))
             day_ = "??" if not game.Day else f"{game.Day.rjust(2, '0')}"
-            date = f"{day_} {game.Month.capitalize()} {game.Year}"
+            date = f"{day_} {game.MonthAndYear.title()}"
 
             mark = ">>> " if date == today else "    "
             mark_and_date = f"{mark}[{date}"
