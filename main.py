@@ -1,4 +1,5 @@
 from Code.Screens.CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
+from Code.Screens.AllRecordedReleasesScreen import AllRecordedReleasesScreen
 from Code.Screens.ThisMonthsReleasesScreen import ThisMonthsReleasesScreen
 from Code.TeverusSDK.Screen import Screen, SCREEN_WIDTH, Action
 from Code.TeverusSDK.Table import Table
@@ -9,7 +10,7 @@ class WelcomeScreen(Screen):
         self.actions = [
             Action(name="Check new games on IGN", function=CheckNewGamesOnIGNScreen),
             Action(name="This month's releases", function=ThisMonthsReleasesScreen),
-            Action(name="See all releases"),
+            Action(name="All recorded releases", function=AllRecordedReleasesScreen),
             Action(name="Releases by game genre"),
         ]
 
