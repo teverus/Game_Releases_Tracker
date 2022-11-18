@@ -10,8 +10,6 @@ from Code.TeverusSDK.Screen import (
     Screen,
     Action,
     SCREEN_WIDTH,
-    GO_BACK_TEXT,
-    do_nothing,
     Key,
     GO_BACK_ACTION,
 )
