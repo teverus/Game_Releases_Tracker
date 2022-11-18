@@ -12,7 +12,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from Code.TeverusSDK.DataBase import DataBase
 from Code.TeverusSDK.Screen import show_message
 
-COLUMNS = ["Title", "Day", "Month", "Year", "UnixReleaseDate", "Genre"]
+COLUMNS = ["Title", "Day", "MonthAndYear", "UnixReleaseDate", "Genre"]
 
 
 class UpdateGames:
@@ -69,9 +69,9 @@ class UpdateGames:
 
         for i, game_card in enumerate(game_cards):
             title, genre, release_date = game_card.text.split("\n")
-            day, month, year = self.get_release_date(release_date)
-            unix_release_date = self.get_unix_release_date(day, month, year)
-            games.loc[i] = [title, day, month, year, unix_release_date, genre]
+            day, month_and_year = self.get_release_date(release_date)
+            unix_release_date = self.get_unix_release_date(day, month_and_year)
+            games.loc[i] = [title, day, month_and_year, unix_release_date, genre]
 
         return games
 
@@ -84,7 +84,7 @@ class UpdateGames:
         except ValueError:
             month, year = release_date.split("/")
 
-        return day, month, year
+        return day, f"{month} {year}"
 
     def get_ign_games(self):
         with self.get_driver(headless=True) as self.driver:
@@ -98,7 +98,7 @@ class UpdateGames:
 
         month = f"{datetime.now():%b}".upper()
         year = f"{datetime.now():%Y}".upper()
-        df = df.loc[(df.Month == month) & (df.Year == year)]
+        df = df.loc[df.MonthAndYear == f"{month} {year}"]
 
         df.drop(columns="Hidden", inplace=True)
 
@@ -107,9 +107,9 @@ class UpdateGames:
         return df, proper_index
 
     @staticmethod
-    def get_unix_release_date(day, month, year):
+    def get_unix_release_date(day, month_and_year):
         if day:
-            expected_date = f"{day.rjust(2, '0')} {month} {year}"
+            expected_date = f"{day.rjust(2, '0')} {month_and_year}"
             date = datetime.strptime(expected_date, "%d %b %Y").timestamp()
 
             return str(int(date))
