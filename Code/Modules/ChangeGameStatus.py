@@ -50,8 +50,7 @@ class ChangeGameStatus:
             del main.actions[target_index]
 
             if not main.table.rows and not main.actions:
-                # TODO !! Вот тут
-                ...
+                main.table.set_nothing_to_show_state()
 
         x, y = main.table.highlight
         main.table.highlight = [x, 0]

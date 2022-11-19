@@ -74,7 +74,7 @@ class Table:
         self.cage = self.get_cage()
 
         # Calculated values
-        self.walls_length = (self.max_columns - 1) * self.wall_length
+        self.walls_length = self.get_walls_length()
         self.visible_rows = self.get_visible_rows()
         self.table_width = self.get_table_width(table_width)
         self.column_widths = self.get_column_widths(column_widths)
@@ -152,7 +152,7 @@ class Table:
 
         return result
 
-    def get_max_columns(self, max_columns):
+    def get_max_columns(self, max_columns=None):
         result = max_columns if max_columns else max([len(r) for r in self.rows])
 
         return result
@@ -176,7 +176,7 @@ class Table:
 
         return table_width
 
-    def get_column_widths(self, target_widths):
+    def get_column_widths(self, target_widths=None):
         actual_width = self.table_width - self.walls_length - self.side_padding_length
         column_widths = {}
 
@@ -252,3 +252,14 @@ class Table:
         is_multiple_pages = bool(len(self.rows) > self.max_rows)
 
         return is_multiple_pages
+
+    def get_walls_length(self):
+        result = (self.max_columns - 1) * self.wall_length
+
+        return result
+
+    def set_nothing_to_show_state(self):
+        self.rows = [["Nothing to show"]]
+        self.max_columns = 1
+        self.walls_length = self.get_walls_length()
+        self.column_widths = self.get_column_widths()
