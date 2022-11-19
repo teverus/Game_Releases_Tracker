@@ -143,6 +143,8 @@ class Table:
         rows = [rows] if not isinstance(rows, list) else rows
         result = [[r] if not isinstance(r, list) else r for r in rows]
 
+        result = [["Nothing to show"]] if not result else result
+
         return result
 
     def get_max_rows(self, max_rows):
@@ -178,7 +180,7 @@ class Table:
         actual_width = self.table_width - self.walls_length - self.side_padding_length
         column_widths = {}
 
-        if not target_widths:
+        if not target_widths or len(target_widths) > self.max_columns:
             target_widths = {i: ColumnWidth.FULL for i in range(self.max_columns)}
 
         fit_cols = {k: v for k, v in target_widths.items() if v == ColumnWidth.FIT}
@@ -215,24 +217,19 @@ class Table:
         return column_widths
 
     def get_visible_rows(self):
-        result = self.rows
+        previous_page = self.current_page - 1
+        start = self.max_rows * previous_page
+        end = self.max_rows * self.current_page
 
-        if self.has_multiple_pages:
-            previous_page = self.current_page - 1
-            start = self.max_rows * previous_page
-            end = self.max_rows * self.current_page
+        pack = self.rows[start:end]
 
-            pack = self.rows[start:end]
+        if len(pack) != self.max_rows:
+            diff = self.max_rows - len(pack)
+            for _ in range(diff):
+                dummy = ["" for __ in range(self.max_columns)]
+                pack.append(dummy)
 
-            if len(pack) != self.max_rows:
-                diff = self.max_rows - len(pack)
-                for _ in range(diff):
-                    dummy = ["" for __ in range(self.max_columns)]
-                    pack.append(dummy)
-
-            result = pack
-
-        return result
+        return pack
 
     def get_cage(self):
         x_axis = [number for number in range(self.max_rows)]

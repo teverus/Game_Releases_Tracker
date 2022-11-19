@@ -1,6 +1,7 @@
+from datetime import datetime
 from Code.Screens.CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
 from Code.Screens.AllRecordedReleasesScreen import AllRecordedReleasesScreen
-from Code.Screens.ThisMonthsReleasesScreen import ThisMonthsReleasesScreen
+from Code.Screens.MonthsReleasesScreen import MonthsReleasesScreen
 from Code.TeverusSDK.Screen import Screen, SCREEN_WIDTH, Action
 from Code.TeverusSDK.Table import Table
 
@@ -8,9 +9,19 @@ from Code.TeverusSDK.Table import Table
 class WelcomeScreen(Screen):
     def __init__(self):
         self.actions = [
-            Action(name="Check new games on IGN", function=CheckNewGamesOnIGNScreen),
-            Action(name="This month's releases", function=ThisMonthsReleasesScreen),
-            Action(name="All recorded releases", function=AllRecordedReleasesScreen),
+            Action(
+                name="Check new games on IGN",
+                function=CheckNewGamesOnIGNScreen,
+            ),
+            Action(
+                name="This month's releases",
+                function=MonthsReleasesScreen,
+                arguments={"month_and_year": datetime.today().strftime("%B %Y")},
+            ),
+            Action(
+                name="All recorded releases",
+                function=AllRecordedReleasesScreen,
+            ),
             Action(name="Releases by game genre"),
         ]
 

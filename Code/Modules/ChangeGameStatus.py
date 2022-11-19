@@ -24,8 +24,8 @@ class ChangeGameStatus:
         main.database.write_to_table(self.df)
 
     def apply_changes_to_table(self, main):
-        self.change_table_rows(main)
         self.change_table_title(main)
+        self.change_table_rows(main)
 
     ####################################################################################
     #    HELPERS                                                                       #
@@ -49,11 +49,15 @@ class ChangeGameStatus:
             del main.table.rows[target_index]
             del main.actions[target_index]
 
+            if not main.table.rows and not main.actions:
+                # TODO !! Вот тут
+                ...
+
         x, y = main.table.highlight
         main.table.highlight = [x, 0]
 
-        main.table.max_page = main.table.get_max_page()
         main.table.has_multiple_pages = main.table.get_multiple_pages()
+        main.table.max_page = main.table.get_max_page()
 
     def change_table_title(self, main):
         if not self.game_is_hidden:

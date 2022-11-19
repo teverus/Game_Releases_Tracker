@@ -16,8 +16,10 @@ from Code.TeverusSDK.Screen import (
 from Code.TeverusSDK.Table import Table, ColumnWidth
 
 
-class ThisMonthsReleasesScreen(Screen):
-    def __init__(self):
+class MonthsReleasesScreen(Screen):
+    def __init__(self, **kwargs):
+        date = kwargs["month_and_year"]
+        self.month_and_year = datetime.strptime(date, "%B %Y").strftime("%b %Y")
         self.SHOW_HIDDEN = "[S] Show hidden"
         self.EXCLUDE_HIDDEN = "[S] Exclude hidden"
         self.database = DataBase(Path("Files/GameReleases.db"))
@@ -26,14 +28,14 @@ class ThisMonthsReleasesScreen(Screen):
 
         self.table = self.get_table(self.actions, main=self)
 
-        super(ThisMonthsReleasesScreen, self).__init__(self.table, self.actions)
+        super(MonthsReleasesScreen, self).__init__(self.table, self.actions)
 
     ####################################################################################
     #    PRIMARY ACTIONS                                                               #
     ####################################################################################
 
     def get_actions(self, remove_hidden, main):
-        rows = self.get_rows(remove_hidden=remove_hidden)
+        rows = self.get_rows(main, remove_hidden)
 
         actions = []
         for game, hidden in rows.items():
@@ -79,7 +81,7 @@ class ThisMonthsReleasesScreen(Screen):
     ####################################################################################
     #    HELPERS                                                                       #
     ####################################################################################
-    def get_rows(self, remove_hidden=False):
+    def get_rows(self, main, remove_hidden=False):
         day = datetime.today().strftime("%d").rjust(2, "0")
         month = datetime.today().strftime("%b").upper()
         year = datetime.today().strftime("%Y")
@@ -87,7 +89,7 @@ class ThisMonthsReleasesScreen(Screen):
 
         df = self.database.read_table()
 
-        df = df.loc[df.MonthAndYear == f"{month} {year}"]
+        df = df.loc[df.MonthAndYear == f"{main.month_and_year.upper()}"]
         df = df.loc[df.Hidden == "0"] if remove_hidden else df
 
         df.reset_index(drop=True, inplace=True)
