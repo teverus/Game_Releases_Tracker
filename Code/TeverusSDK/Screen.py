@@ -31,9 +31,8 @@ class Action:
     ):
         """
         [arguments]
-            * A dict where key is the name of the argument in the function,
-            value - the actual value
-            * Key and the name of the argument must be identical
+            * A dict where key is the name of the argument in the function, value - the actual value
+            * Key and the name of the argument in the function must be identical
             * Example: {"game_title": row}
         """
         self.name = name

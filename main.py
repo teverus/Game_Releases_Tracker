@@ -1,6 +1,15 @@
+"""
+TODO Game status doesn't change
+    1 - All recorded releases
+    2 - Pick a month
+    3 - Show hidden
+    4 - Unhide a game
+"""
+
 from datetime import datetime
-from Code.Screens.CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
+
 from Code.Screens.AllRecordedReleasesScreen import AllRecordedReleasesScreen
+from Code.Screens.CheckNewGamesOnIGNScreen import CheckNewGamesOnIGNScreen
 from Code.Screens.MonthsReleasesScreen import MonthsReleasesScreen
 from Code.TeverusSDK.Screen import Screen, SCREEN_WIDTH, Action
 from Code.TeverusSDK.Table import Table
