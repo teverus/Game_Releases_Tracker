@@ -50,7 +50,7 @@ class MonthsReleasesScreen(Screen):
             secondary_action = Action(
                 name="  Hide  " if not hidden else " Unhide ",
                 function=ChangeGameStatus,
-                arguments={"game_title": game_title, "main": main, "status": hidden},
+                arguments={"game_title": game_title, "main": main},
             )
 
             actions.append([main_action, secondary_action])
