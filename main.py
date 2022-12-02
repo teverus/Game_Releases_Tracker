@@ -1,11 +1,3 @@
-"""
-TODO Game status doesn't change
-    1 - All recorded releases
-    2 - Pick a month
-    3 - Show hidden
-    4 - Unhide a game
-"""
-
 from datetime import datetime
 
 from Code.Screens.AllRecordedReleasesScreen import AllRecordedReleasesScreen

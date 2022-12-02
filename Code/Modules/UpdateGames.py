@@ -81,8 +81,10 @@ class UpdateGames:
 
         try:
             month, day, year = release_date.replace(",", "").split(" ")
+
         except ValueError:
             month, year = release_date.split("/")
+            month = "DEC" if "Q" in month or "TBA" in month else month
 
         return day, f"{month} {year}"
 
