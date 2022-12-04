@@ -4,6 +4,8 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup
 from requests import get
 
+from Code.TeverusSDK.Screen import show_message
+
 
 class OpenInSteam:
     def __init__(self, game_title):
@@ -21,4 +23,4 @@ class OpenInSteam:
         try:
             webbrowser.open(steam_link)
         except Exception:
-            raise Exception(f"Couldn't open {steam_link}")
+            show_message(f"""Couldn't open "{game_title}" in Steam""")
