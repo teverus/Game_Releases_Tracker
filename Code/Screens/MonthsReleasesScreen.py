@@ -39,7 +39,7 @@ class MonthsReleasesScreen(Screen):
 
         actions = []
         for game, hidden in rows.items():
-            game_title = re.findall(r".*\[.*\].(.*)", game)[0].strip()
+            game_title = re.findall(r"\[.*\w{3}.\d{4}\].(.*)", game)[0].strip()
 
             main_action = Action(
                 name=game,
