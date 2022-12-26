@@ -10,13 +10,13 @@ class ChangeGameStatus:
         self.main = main
         self.target_index = self.get_target_index()
         self.df = main.database.read_table()
-        self.game_is_hidden = self.get_hidden_status()
+        self.game_is_currently_hidden = self.get_hidden_status()
         self.show_hidden_games = self.get_show_hidden_games()
 
         self.write_changes_to_db()
         self.apply_changes_to_table(main)
 
-        target_state = "unhidden" if self.game_is_hidden else "hidden"
+        target_state = "unhidden" if self.game_is_currently_hidden else "hidden"
         show_message(f'Release of "{self.title}" is now {target_state}')
 
     ####################################################################################
@@ -25,7 +25,7 @@ class ChangeGameStatus:
 
     def write_changes_to_db(self):
         index = self.df.loc[self.df.Title == self.title].index.values[0]
-        target_status = "1" if not self.game_is_hidden else "0"
+        target_status = "1" if not self.game_is_currently_hidden else "0"
         self.df.loc[index, "Hidden"] = target_status
         self.main.database.write_to_table(self.df)
 
@@ -45,18 +45,21 @@ class ChangeGameStatus:
                     return row_index
 
     def change_table_rows(self, main):
+        rows_before = main.table.max_rows * (main.table.current_page - 1)
+        adjusted_index = rows_before + self.target_index
 
-        if self.game_is_hidden:
-            main.actions[self.target_index][1].name = HIDE
-            main.table.rows[self.target_index][1] = HIDE
+        if self.game_is_currently_hidden:
+            main.actions[adjusted_index][1].name = HIDE
+            main.table.rows[adjusted_index][1] = HIDE
 
-        elif not self.game_is_hidden and self.show_hidden_games:
-            main.actions[self.target_index][1].name = UNHIDE
-            main.table.rows[self.target_index][1] = UNHIDE
+        elif not self.game_is_currently_hidden and self.show_hidden_games:
+            main.actions[adjusted_index][1].name = UNHIDE
+            main.table.rows[adjusted_index][1] = UNHIDE
 
         else:
-            del main.table.rows[self.target_index]
-            del main.actions[self.target_index]
+
+            del main.table.rows[adjusted_index]
+            del main.actions[adjusted_index]
 
             if not main.table.rows and not main.actions:
                 main.table.set_nothing_to_show_state()
@@ -68,9 +71,9 @@ class ChangeGameStatus:
         main.table.max_page = main.table.get_max_page()
 
     def change_table_title(self, main):
-        if not self.game_is_hidden and not self.show_hidden_games:
+        if not self.game_is_currently_hidden and not self.show_hidden_games:
             old_number = int(main.table.table_title.split("[")[-1].split("]")[0])
-            delta = -1 if not self.game_is_hidden else 1
+            delta = -1 if not self.game_is_currently_hidden else 1
             new_number = old_number + delta
             new_title = main.table.table_title.replace(str(old_number), str(new_number))
             main.table.table_title = new_title
