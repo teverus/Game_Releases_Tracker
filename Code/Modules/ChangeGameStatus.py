@@ -1,3 +1,5 @@
+from math import ceil
+
 from Code.TeverusSDK.Screen import show_message
 
 HIDE = "  Hide  "
@@ -63,6 +65,11 @@ class ChangeGameStatus:
 
             if not main.table.rows and not main.actions:
                 main.table.set_nothing_to_show_state()
+
+            max_page = ceil(len(main.table.rows) / main.table.max_rows)
+            if max_page < main.table.max_page:
+                main.table.current_page = max_page
+                main.table.max_page = max_page
 
         x, y = main.table.highlight
         main.table.highlight = [x, 0]
