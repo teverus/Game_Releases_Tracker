@@ -243,10 +243,9 @@ class Table:
         return coordinates
 
     def get_max_page(self):
-        if self.has_multiple_pages:
-            max_page = ceil(len(self.rows) / self.max_rows)
+        max_p = ceil(len(self.rows) / self.max_rows) if self.has_multiple_pages else 1
 
-            return max_page
+        return max_p
 
     def get_multiple_pages(self):
         is_multiple_pages = bool(len(self.rows) > self.max_rows)
