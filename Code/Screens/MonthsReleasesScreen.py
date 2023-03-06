@@ -4,6 +4,7 @@ from pathlib import Path
 
 from Code.Modules.ChangeGameStatus import ChangeGameStatus
 from Code.Modules.OpenInSteam import OpenInSteam
+from Code.Modules.PinGame import PinGame
 from Code.Modules.ShowHiddenReleases import ShowHiddenReleases
 from Code.TeverusSDK.DataBase import DataBase
 from Code.TeverusSDK.Screen import (
@@ -53,18 +54,24 @@ class MonthsReleasesScreen(Screen):
                 arguments={"game_title": game_title, "main": main},
             )
 
-            actions.append([main_action, secondary_action])
+            tertiary_action = Action(
+                name=" Pin ",
+                function=PinGame,
+                arguments={"game_title": game_title, "main": main},
+            )
+
+            actions.append([main_action, secondary_action, tertiary_action])
 
         return actions
 
     def get_table(self, actions, main):
         table = Table(
             table_title=f"This month's releases [{len(actions)}]",
-            rows=[[action[0].name, action[1].name] for action in actions],
+            rows=[[a[0].name, a[1].name, a[2].name] for a in actions],
             table_width=SCREEN_WIDTH,
             max_rows=29,
             highlight=[0, 0],
-            column_widths={0: ColumnWidth.FULL, 1: ColumnWidth.FIT},
+            column_widths={0: ColumnWidth.FIT, 1: ColumnWidth.FIT, 2: ColumnWidth.FIT},
             footer=[
                 GO_BACK_ACTION,
                 Action(
@@ -97,6 +104,7 @@ class MonthsReleasesScreen(Screen):
         wall = 3
         side_padding = 2
         hide = 8
+        pin = 7
 
         games = {}
         for index in range(len(df)):
@@ -108,7 +116,7 @@ class MonthsReleasesScreen(Screen):
 
             mark = ">>> " if date == today else "    "
             mark_and_date = f"{mark}[{date}"
-            main_col_width = len(mark_and_date) + (wall * 2) + side_padding + hide
+            main_col_width = len(mark_and_date) + (wall * 2) + side_padding + hide + pin
             line = f"{mark_and_date}] {title.ljust(SCREEN_WIDTH - main_col_width)}"
             games[line] = hidden
 

@@ -1,0 +1,3 @@
+class PinGame:
+    def __init__(self, game_title, main):
+        ...
