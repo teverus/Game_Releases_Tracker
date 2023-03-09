@@ -68,7 +68,8 @@ class ChangeGameStatus:
 
             max_page = ceil(len(main.table.rows) / main.table.max_rows)
             if max_page < main.table.max_page:
-                main.table.current_page = max_page
+                if main.table.current_page > max_page:
+                    main.table.current_page = max_page
                 main.table.max_page = max_page
 
         x, y = main.table.highlight
