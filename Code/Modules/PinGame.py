@@ -32,6 +32,7 @@ class PinGame:
         # === ACTIONS ==================================================================
         self.change_pin_button()
         self.change_game_title()
+        self.change_pinned_status_in_db()
 
     ####################################################################################
     #    ACTIONS                                                                       #
@@ -50,6 +51,10 @@ class PinGame:
         new_status = TODAY if new_status == FREE and is_released_today else new_status
 
         self.main.table.rows[self.target_index][TITLE] = f"{new_status} {title[4:]}"
+
+    def change_pinned_status_in_db(self):
+        # TODO change_pinned_status_in_db
+        ...
 
     ####################################################################################
     #    HELPERS                                                                       #
