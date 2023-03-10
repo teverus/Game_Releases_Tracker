@@ -31,7 +31,7 @@ class UpdateGames:
 
         different_length = len(self.ign_games) != len(self.known_games)
         if different_length or len(self.ign_games.compare(self.known_games)):
-            self.update_ign_games_hidden_status()
+            self.add_data_to_ign_games_df()
             self.db.remove_by_index(self.known_index)
             self.db.append_to_table(self.ign_games)
             show_message("Information was updated")
@@ -96,17 +96,17 @@ class UpdateGames:
             return game_cards
 
     def get_known_games(self):
-        df = self.db.read_table()
-
         month = f"{datetime.now():%b}".upper()
         year = f"{datetime.now():%Y}".upper()
-        df = df.loc[df.MonthAndYear == f"{month} {year}"]
+        this_month_games = self.df.loc[self.df.MonthAndYear == f"{month} {year}"]
 
-        df.drop(columns="Hidden", inplace=True)
+        columns_to_drop = ["Hidden", "Pinned"]
+        for column in columns_to_drop:
+            this_month_games.drop(columns=column, inplace=True)
 
-        proper_index = list(df.index)
-        df.reset_index(drop=True, inplace=True)
-        return df, proper_index
+        proper_index = list(this_month_games.index)
+        this_month_games.reset_index(drop=True, inplace=True)
+        return this_month_games, proper_index
 
     @staticmethod
     def get_unix_release_date(day, month_and_year):
@@ -116,12 +116,16 @@ class UpdateGames:
 
             return str(int(date))
 
-    def update_ign_games_hidden_status(self):
+    def add_data_to_ign_games_df(self):
         for index in range(len(self.ign_games)):
             title = self.ign_games.loc[index].Title
             game_record = self.df.loc[self.df.Title == title]
-            current_status = "0" if game_record.empty else game_record.Hidden.values[0]
-            self.ign_games.loc[index, "Hidden"] = current_status
+
+            hidden_status = "0" if game_record.empty else game_record.Hidden.values[0]
+            pinned_status = "0" if game_record.empty else game_record.Pinned.values[0]
+
+            self.ign_games.loc[index, "Hidden"] = hidden_status
+            self.ign_games.loc[index, "Pinned"] = pinned_status
 
 
 if __name__ == "__main__":
