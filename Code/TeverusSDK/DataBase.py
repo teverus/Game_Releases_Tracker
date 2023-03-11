@@ -37,10 +37,10 @@ class DataBase:
         [index]
             * Can be a single index or a list of indices
         """
-        index = [index] if not isinstance(index, list) else index
+        refined_index = [index] if not isinstance(index, list) else index
 
         table = self.read_table()
-        table.drop(index=index, inplace=True)
+        table.drop(index=refined_index, inplace=True)
 
         self.write_to_table(table)
 

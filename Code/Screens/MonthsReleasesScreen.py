@@ -4,6 +4,7 @@ from pathlib import Path
 
 from Code.Modules.ChangeGameStatus import ChangeGameStatus
 from Code.Modules.OpenInSteam import OpenInSteam
+from Code.Modules.PinGame import PinGame
 from Code.Modules.ShowHiddenReleases import ShowHiddenReleases
 from Code.TeverusSDK.DataBase import DataBase
 from Code.TeverusSDK.Screen import (
@@ -38,7 +39,8 @@ class MonthsReleasesScreen(Screen):
         rows = self.get_rows(main, remove_hidden)
 
         actions = []
-        for game, hidden in rows.items():
+        for game, statuses in rows.items():
+            hidden, pinned = statuses
             game_title = re.findall(r"\[.*\w{3}.\d{4}\].(.*)", game)[0].strip()
 
             main_action = Action(
@@ -48,23 +50,29 @@ class MonthsReleasesScreen(Screen):
             )
 
             secondary_action = Action(
-                name="  Hide  " if not hidden else " Unhide ",
+                name=" Hide " if not hidden else "Unhide",
                 function=ChangeGameStatus,
                 arguments={"game_title": game_title, "main": main},
             )
 
-            actions.append([main_action, secondary_action])
+            tertiary_action = Action(
+                name=" Pin " if not pinned else "Unpin",
+                function=PinGame,
+                arguments={"game_title": game_title, "main": main},
+            )
+
+            actions.append([main_action, secondary_action, tertiary_action])
 
         return actions
 
     def get_table(self, actions, main):
         table = Table(
             table_title=f"This month's releases [{len(actions)}]",
-            rows=[[action[0].name, action[1].name] for action in actions],
+            rows=[[a[0].name, a[1].name, a[2].name] for a in actions],
             table_width=SCREEN_WIDTH,
             max_rows=29,
             highlight=[0, 0],
-            column_widths={0: ColumnWidth.FULL, 1: ColumnWidth.FIT},
+            column_widths={0: ColumnWidth.FIT, 1: ColumnWidth.FIT, 2: ColumnWidth.FIT},
             footer=[
                 GO_BACK_ACTION,
                 Action(
@@ -82,11 +90,42 @@ class MonthsReleasesScreen(Screen):
     #    HELPERS                                                                       #
     ####################################################################################
     def get_rows(self, main, remove_hidden=False):
+        today = self.get_today()
+        df = self.get_df(main, remove_hidden)
+
+        wall = 2
+        side_padding = 2
+        hide = 8
+        pin = 7
+
+        games = {}
+        for index in range(len(df)):
+            game = df.loc[index]
+            title = game.Title
+            hidden = bool(int(game.Hidden))
+            pinned = bool(int(game.Pinned))
+            day_ = "??" if not game.Day else f"{game.Day.rjust(2, '0')}"
+            date = f"{day_} {game.MonthAndYear.title()}"
+
+            mark = "### " if pinned else "    "
+            mark = ">>> " if date == today else mark
+            mark_and_date = f"{mark}[{date}"
+            main_col_width = len(mark_and_date) + (wall * 2) + side_padding + hide + pin
+            line = f"{mark_and_date}] {title.ljust(SCREEN_WIDTH - main_col_width)}"
+            games[line] = [hidden, pinned]
+
+        return games
+
+    @staticmethod
+    def get_today():
         day = datetime.today().strftime("%d").rjust(2, "0")
         month = datetime.today().strftime("%b").upper()
         year = datetime.today().strftime("%Y")
         today = f"{day} {month.capitalize()} {year}"
 
+        return today
+
+    def get_df(self, main, remove_hidden):
         df = self.database.read_table()
 
         df = df.loc[df.MonthAndYear == f"{main.month_and_year.upper()}"]
@@ -94,22 +133,4 @@ class MonthsReleasesScreen(Screen):
 
         df.reset_index(drop=True, inplace=True)
 
-        wall = 3
-        side_padding = 2
-        hide = 8
-
-        games = {}
-        for index in range(len(df)):
-            game = df.loc[index]
-            title = game.Title
-            hidden = bool(int(game.Hidden))
-            day_ = "??" if not game.Day else f"{game.Day.rjust(2, '0')}"
-            date = f"{day_} {game.MonthAndYear.title()}"
-
-            mark = ">>> " if date == today else "    "
-            mark_and_date = f"{mark}[{date}"
-            main_col_width = len(mark_and_date) + (wall * 2) + side_padding + hide
-            line = f"{mark_and_date}] {title.ljust(SCREEN_WIDTH - main_col_width)}"
-            games[line] = hidden
-
-        return games
+        return df

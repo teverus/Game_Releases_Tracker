@@ -15,8 +15,8 @@ class ChangeGameStatus:
         self.game_is_currently_hidden = self.get_hidden_status()
         self.show_hidden_games = self.get_show_hidden_games()
 
-        self.write_changes_to_db()
         self.apply_changes_to_table(main)
+        self.write_changes_to_db()
 
         target_state = "unhidden" if self.game_is_currently_hidden else "hidden"
         show_message(f'Release of "{self.title}" is now {target_state}')
@@ -68,7 +68,8 @@ class ChangeGameStatus:
 
             max_page = ceil(len(main.table.rows) / main.table.max_rows)
             if max_page < main.table.max_page:
-                main.table.current_page = max_page
+                if main.table.current_page > max_page:
+                    main.table.current_page = max_page
                 main.table.max_page = max_page
 
         x, y = main.table.highlight
@@ -86,12 +87,12 @@ class ChangeGameStatus:
             main.table.table_title = new_title
 
     def get_hidden_status(self):
-        is_hidden = HIDE != self.main.table.visible_rows[self.target_index][-1]
+        is_hidden = HIDE != self.main.table.visible_rows[self.target_index][1]
 
         return is_hidden
 
     def get_show_hidden_games(self):
-        current_footer_filter = [a.name for a in self.main.table.footer][-1]
+        current_footer_filter = [a.name for a in self.main.table.footer][1]
         show_hidden_games = self.main.SHOW_HIDDEN != current_footer_filter
 
         return show_hidden_games
