@@ -10,6 +10,8 @@ PINNED = "###"
 FREE = "   "
 TODAY = ">>>"
 
+BOOL_TO_PIN = {"0": "1", "1": "0"}
+
 NEW_STATUS = {
     PIN: UNPIN,
     UNPIN: PIN,
@@ -53,8 +55,13 @@ class PinGame:
         self.main.table.rows[self.target_index][TITLE] = f"{new_status} {title[4:]}"
 
     def change_pinned_status_in_db(self):
-        # TODO change_pinned_status_in_db
-        ...
+        index = self.df.loc[self.df.Title == self.title].index.values[0]
+        current_pinned_status = self.df.loc[index, "Pinned"]
+        new_pinned_status = BOOL_TO_PIN[current_pinned_status]
+
+        self.df.loc[index, "Pinned"] = new_pinned_status
+
+        self.main.database.write_to_table(self.df)
 
     ####################################################################################
     #    HELPERS                                                                       #

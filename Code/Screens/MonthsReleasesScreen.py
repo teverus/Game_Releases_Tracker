@@ -39,7 +39,8 @@ class MonthsReleasesScreen(Screen):
         rows = self.get_rows(main, remove_hidden)
 
         actions = []
-        for game, hidden in rows.items():
+        for game, statuses in rows.items():
+            hidden, pinned = statuses
             game_title = re.findall(r"\[.*\w{3}.\d{4}\].(.*)", game)[0].strip()
 
             main_action = Action(
@@ -49,13 +50,13 @@ class MonthsReleasesScreen(Screen):
             )
 
             secondary_action = Action(
-                name="  Hide  " if not hidden else " Unhide ",
+                name=" Hide " if not hidden else "Unhide",
                 function=ChangeGameStatus,
                 arguments={"game_title": game_title, "main": main},
             )
 
             tertiary_action = Action(
-                name=" Pin ",
+                name=" Pin " if not pinned else "Unpin",
                 function=PinGame,
                 arguments={"game_title": game_title, "main": main},
             )
@@ -89,19 +90,10 @@ class MonthsReleasesScreen(Screen):
     #    HELPERS                                                                       #
     ####################################################################################
     def get_rows(self, main, remove_hidden=False):
-        day = datetime.today().strftime("%d").rjust(2, "0")
-        month = datetime.today().strftime("%b").upper()
-        year = datetime.today().strftime("%Y")
-        today = f"{day} {month.capitalize()} {year}"
+        today = self.get_today()
+        df = self.get_df(main, remove_hidden)
 
-        df = self.database.read_table()
-
-        df = df.loc[df.MonthAndYear == f"{main.month_and_year.upper()}"]
-        df = df.loc[df.Hidden == "0"] if remove_hidden else df
-
-        df.reset_index(drop=True, inplace=True)
-
-        wall = 3
+        wall = 2
         side_padding = 2
         hide = 8
         pin = 7
@@ -111,13 +103,34 @@ class MonthsReleasesScreen(Screen):
             game = df.loc[index]
             title = game.Title
             hidden = bool(int(game.Hidden))
+            pinned = bool(int(game.Pinned))
             day_ = "??" if not game.Day else f"{game.Day.rjust(2, '0')}"
             date = f"{day_} {game.MonthAndYear.title()}"
 
-            mark = ">>> " if date == today else "    "
+            mark = "### " if pinned else "    "
+            mark = ">>> " if date == today else mark
             mark_and_date = f"{mark}[{date}"
             main_col_width = len(mark_and_date) + (wall * 2) + side_padding + hide + pin
             line = f"{mark_and_date}] {title.ljust(SCREEN_WIDTH - main_col_width)}"
-            games[line] = hidden
+            games[line] = [hidden, pinned]
 
         return games
+
+    @staticmethod
+    def get_today():
+        day = datetime.today().strftime("%d").rjust(2, "0")
+        month = datetime.today().strftime("%b").upper()
+        year = datetime.today().strftime("%Y")
+        today = f"{day} {month.capitalize()} {year}"
+
+        return today
+
+    def get_df(self, main, remove_hidden):
+        df = self.database.read_table()
+
+        df = df.loc[df.MonthAndYear == f"{main.month_and_year.upper()}"]
+        df = df.loc[df.Hidden == "0"] if remove_hidden else df
+
+        df.reset_index(drop=True, inplace=True)
+
+        return df
