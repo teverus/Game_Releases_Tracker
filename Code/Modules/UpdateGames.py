@@ -102,7 +102,7 @@ class UpdateGames:
 
         columns_to_drop = ["Hidden", "Pinned"]
         for column in columns_to_drop:
-            this_month_games.drop(columns=column, inplace=True)
+            this_month_games = this_month_games.drop(columns=column)
 
         proper_index = list(this_month_games.index)
         this_month_games.reset_index(drop=True, inplace=True)
