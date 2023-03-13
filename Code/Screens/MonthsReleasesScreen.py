@@ -2,9 +2,9 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from Code.Modules.ChangeGameStatus import ChangeGameStatus
+from Code.Modules.ChangeGameStatus import ChangeGameStatus, HIDE, UNHIDE
 from Code.Modules.OpenInSteam import OpenInSteam
-from Code.Modules.PinGame import PinGame
+from Code.Modules.PinGame import PinGame, PIN, UNPIN
 from Code.Modules.ShowHiddenReleases import ShowHiddenReleases
 from Code.TeverusSDK.DataBase import DataBase
 from Code.TeverusSDK.Screen import (
@@ -50,13 +50,13 @@ class MonthsReleasesScreen(Screen):
             )
 
             secondary_action = Action(
-                name=" Hide " if not hidden else "Unhide",
+                name=HIDE if not hidden else UNHIDE,
                 function=ChangeGameStatus,
                 arguments={"game_title": game_title, "main": main},
             )
 
             tertiary_action = Action(
-                name=" Pin " if not pinned else "Unpin",
+                name=PIN if not pinned else UNPIN,
                 function=PinGame,
                 arguments={"game_title": game_title, "main": main},
             )

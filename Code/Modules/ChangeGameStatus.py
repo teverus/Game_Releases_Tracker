@@ -2,8 +2,8 @@ from math import ceil
 
 from Code.TeverusSDK.Screen import show_message
 
-HIDE = "  Hide  "
-UNHIDE = " Unhide "
+HIDE = " Hide "
+UNHIDE = "Unhide"
 
 
 class ChangeGameStatus:
