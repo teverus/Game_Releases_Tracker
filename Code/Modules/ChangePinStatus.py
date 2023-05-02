@@ -23,7 +23,7 @@ NEW_INDICATION = {
 }
 
 
-class PinGame:
+class ChangePinStatus:
     def __init__(self, game_title, main):
         # === VARIABLES ================================================================
         self.title = game_title
@@ -40,19 +40,19 @@ class PinGame:
     #    ACTIONS                                                                       #
     ####################################################################################
     def change_pin_button(self):
-        pinned_status = self.main.table.rows[self.target_index][PIN_STATUS]
+        pinned_status = self.main.table.visible_rows[self.target_index][PIN_STATUS]
         new_status = NEW_STATUS[pinned_status]
 
-        self.main.table.rows[self.target_index][PIN_STATUS] = new_status
+        self.main.table.visible_rows[self.target_index][PIN_STATUS] = new_status
 
     def change_game_title(self):
-        title = self.main.table.rows[self.target_index][TITLE]
+        title = self.main.table.visible_rows[self.target_index][TITLE]
         pinned_status = title[:3]
-        new_status = NEW_INDICATION[pinned_status]
+        new_st = NEW_INDICATION[pinned_status]
         is_released_today = self.get_if_released_today()
-        new_status = TODAY if new_status == FREE and is_released_today else new_status
+        new_st = TODAY if new_st == FREE and is_released_today else new_st
 
-        self.main.table.rows[self.target_index][TITLE] = f"{new_status} {title[4:]}"
+        self.main.table.visible_rows[self.target_index][TITLE] = f"{new_st} {title[4:]}"
 
     def change_pinned_status_in_db(self):
         index = self.df.loc[self.df.Title == self.title].index.values[0]
@@ -75,7 +75,7 @@ class PinGame:
                     return row_index
 
     def get_if_released_today(self):
-        indicated_date = self.main.table.rows[self.target_index][TITLE][5:16]
+        indicated_date = self.main.table.visible_rows[self.target_index][TITLE][5:16]
 
         day = datetime.today().strftime("%d").rjust(2, "0")
         month = datetime.today().strftime("%b").upper()

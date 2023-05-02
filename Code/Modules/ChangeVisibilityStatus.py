@@ -6,7 +6,7 @@ HIDE = " Hide "
 UNHIDE = "Unhide"
 
 
-class ChangeGameStatus:
+class ChangeVisibilityStatus:
     def __init__(self, game_title, main):
         self.title = game_title
         self.main = main
